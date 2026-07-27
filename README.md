@@ -10,6 +10,7 @@ Educational institutions are overwhelmed by high volumes of repetitive academic 
 ---
 ## Architecture
 
+```
 Student → API Gateway (REST) → Lambda (per-route handler)
                                    │
                     ┌──────────────┼───────────────┐
@@ -19,6 +20,8 @@ Student → API Gateway (REST) → Lambda (per-route handler)
                                               response written back
                                                      ▼
                                               DynamoDB (store Q&A pair)
+
+```
 
 
 **Core AWS services:** API Gateway, Lambda, DynamoDB, CloudWatch, IAM (OIDC federation from GitHub Actions), Bedrock (or OpenAI API for AI responses).
@@ -59,8 +62,8 @@ Student → API Gateway (REST) → Lambda (per-route handler)
 
 ### Local Setup
 ```bash
-git clone https://github.com/<your-org>/student-support-system.git
-cd student-support-system
+git clone https://github.com/Humaidu/AI-Powered-Student-Support-System.git
+cd AI-Powered-Student-Support-System
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 ```
