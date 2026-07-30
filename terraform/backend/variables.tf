@@ -24,22 +24,10 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "github_org" {
-  description = "GitHub org or username that owns this repo — used to restrict which repo can assume the CI/CD deploy role"
-  type        = string
-  default = "Humaidu"
-}
-
-variable "github_repo" {
-  description = "GitHub repo name — used together with github_org to scope the OIDC trust policy"
-  type        = string
-  default = "AI-Powered-Student-Support-System"
-}
-
 variable "bedrock_generation_model_id" {
   description = "Bedrock model ID used to generate chat answers"
   type        = string
-  default     = "anthropic.claude-3-5-sonnet-20240620-v1:0"
+  default     = "anthropic.claude-3-sonnet-20240229-v1:0"
 }
 
 variable "bedrock_embedding_model_id" {

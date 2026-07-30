@@ -7,11 +7,6 @@ output "api_endpoint" {
   value       = aws_apigatewayv2_api.this.api_endpoint
 }
 
-output "github_actions_role_arn" {
-  description = "Set this as the AWS_DEPLOY_ROLE_ARN GitHub secret so CI/CD can deploy via OIDC"
-  value       = aws_iam_role.github_actions_deploy.arn
-}
-
 output "dynamodb_table_name" {
   value = aws_dynamodb_table.app.name
 }

@@ -9,15 +9,32 @@
 # collection will even come up: encryption, network, and data access. All
 # three are created here, scoped as tightly as this MVP allows.
 
+locals {
+  # OpenSearch Serverless collection/policy names are capped at 32
+  # characters — unlike almost every other resource in this project, we
+  # can't just use "${var.project_name}-something-${var.environment}"
+  # directly, since a longer project_name (e.g. "hypervisor-student-
+  # support") blows past that limit immediately. This truncates
+  # project_name to at most 15 characters before appending a short
+  # suffix, keeping every name comfortably under 32 regardless of how
+  # long project_name or environment are.
+  #
+  # Also computed once here (rather than repeating the interpolation in
+  # every policy's Resource field) so the collection name can never drift
+  # between the policies and the collection resource itself.
+  aoss_prefix     = length(var.project_name) > 15 ? substr(var.project_name, 0, 15) : var.project_name
+  collection_name = "${local.aoss_prefix}-vec-${var.environment}"
+}
+
 resource "aws_opensearchserverless_security_policy" "encryption" {
-  name = "${var.project_name}-encryption-${var.environment}"
+  name = "${local.aoss_prefix}-enc-${var.environment}"
   type = "encryption"
 
   policy = jsonencode({
     Rules = [
       {
         ResourceType = "collection"
-        Resource     = ["collection/${var.project_name}-vectors-${var.environment}"]
+        Resource     = ["collection/${local.collection_name}"]
       }
     ]
     AWSOwnedKey = true
@@ -25,7 +42,7 @@ resource "aws_opensearchserverless_security_policy" "encryption" {
 }
 
 resource "aws_opensearchserverless_security_policy" "network" {
-  name = "${var.project_name}-network-${var.environment}"
+  name = "${local.aoss_prefix}-net-${var.environment}"
   type = "network"
 
   # AllowFromPublic=true keeps this simple for the MVP (Lambda calls the
@@ -38,7 +55,7 @@ resource "aws_opensearchserverless_security_policy" "network" {
       Rules = [
         {
           ResourceType = "collection"
-          Resource     = ["collection/${var.project_name}-vectors-${var.environment}"]
+          Resource     = ["collection/${local.collection_name}"]
         }
       ]
       AllowFromPublic = true
@@ -50,7 +67,7 @@ resource "aws_opensearchserverless_security_policy" "network" {
 # collection — this is what actually grants the Lambda execution role
 # permission to index and search vectors, separate from network reachability.
 resource "aws_opensearchserverless_access_policy" "data" {
-  name = "${var.project_name}-data-access-${var.environment}"
+  name = "${local.aoss_prefix}-data-${var.environment}"
   type = "data"
 
   policy = jsonencode([
@@ -58,12 +75,12 @@ resource "aws_opensearchserverless_access_policy" "data" {
       Rules = [
         {
           ResourceType = "index"
-          Resource     = ["index/${var.project_name}-vectors-${var.environment}/*"]
+          Resource     = ["index/${local.collection_name}/*"]
           Permission   = ["aoss:*"]
         },
         {
           ResourceType = "collection"
-          Resource     = ["collection/${var.project_name}-vectors-${var.environment}"]
+          Resource     = ["collection/${local.collection_name}"]
           Permission   = ["aoss:*"]
         }
       ]
@@ -76,7 +93,7 @@ resource "aws_opensearchserverless_access_policy" "data" {
 }
 
 resource "aws_opensearchserverless_collection" "vectors" {
-  name = "${var.project_name}-vectors-${var.environment}"
+  name = local.collection_name
   type = "VECTORSEARCH"
 
   depends_on = [
