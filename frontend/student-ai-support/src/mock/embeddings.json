@@ -1,0 +1,122 @@
+[
+  {
+    "chunkId": "chk-001",
+    "documentId": "doc-102",
+    "documentTitle": "Admissions Policy & Scholarships",
+    "content": "Academic Merit Scholarship Criteria for Fall 2024: International and domestic students are eligible for the Academic Merit Scholarship if they possess a minimum cumulative GPA of 3.85 (on a 4.0 scale). Standardized test scores of SAT 1450+ or ACT 32+ are recommended. Students must maintain full-time enrollment of at least 12 credits per semester. The final application deadline for merit consideration is July 15, 2024.",
+    "embedding": [0.12, 0.45, -0.23, 0.88, 0.34, 0.19, -0.67, 0.91, 0.05, 0.33],
+    "metadata": {
+      "pageNumber": 18,
+      "section": "Appendix B: International Standards",
+      "documentVersion": "v3.0"
+    }
+  },
+  {
+    "chunkId": "chk-002",
+    "documentId": "doc-101",
+    "documentTitle": "2024 Student Handbook",
+    "content": "Section 4.2 Financial Aid and Merit Grants: The Hypervisor Educational Complex offers merit assistance to top-tier undergraduate and postgraduate candidates. Grant awards cover up to 75% of tuition fees subject to maintaining an annual cumulative GPA retention of 3.75+ and zero disciplinary infractions.",
+    "embedding": [0.10, 0.40, -0.20, 0.82, 0.30, 0.22, -0.60, 0.85, 0.08, 0.30],
+    "metadata": {
+      "pageNumber": 112,
+      "section": "Section 4.2: Financial Aid",
+      "documentVersion": "v2.4"
+    }
+  },
+  {
+    "chunkId": "chk-003",
+    "documentId": "doc-104",
+    "documentTitle": "Course Registration & Exam Timetable Guide",
+    "content": "Academic Calendar & Course Registration for Fall/Winter: Add/Drop course adjustment period opens on November 1st and closes strictly on November 15th. Fall Semester mid-term examinations commence October 10th. Final semester examinations run from December 5th to December 20th. No late add requests are permitted after November 15th.",
+    "embedding": [0.85, 0.12, 0.55, -0.10, 0.20, 0.75, 0.15, -0.30, 0.44, 0.12],
+    "metadata": {
+      "pageNumber": 4,
+      "section": "Section 1.1: Academic Calendar Key Dates",
+      "documentVersion": "v4.1"
+    }
+  },
+  {
+    "chunkId": "chk-004",
+    "documentId": "doc-103",
+    "documentTitle": "Hostel & Residence Hall Guidelines",
+    "content": "Dormitory Access & Smart Card Key Replacement: Resident students experiencing digital keycard malfunctions or lock failures should report to the Housing Maintenance Office in Hall B or submit a ticket in the student portal. Replacement smart cards are issued free of charge for hardware defects, or for a $15 fee in cases of lost or stolen keycards.",
+    "embedding": [-0.30, 0.15, 0.70, 0.10, -0.45, 0.30, 0.80, 0.12, -0.10, 0.65],
+    "metadata": {
+      "pageNumber": 12,
+      "section": "Section 3.4: Residence Access & Digital Locks",
+      "documentVersion": "v1.2"
+    }
+  },
+  {
+    "chunkId": "chk-005",
+    "documentId": "doc-105",
+    "documentTitle": "Tuition Fees & Merit Financial Aid Policy",
+    "content": "Fee Structure & Bursar Payment Portals: Tuition payments can be settled via credit card, wire transfer, or instant campus portal. Instalment payment arrangements must be registered with the Bursar Office prior to the 5th working day of the term. Financial aid grant disbursements reflect in student portal balances by October 30th.",
+    "embedding": [0.40, 0.35, -0.10, 0.60, 0.50, -0.20, 0.30, 0.70, 0.15, -0.25],
+    "metadata": {
+      "pageNumber": 14,
+      "section": "Section 2.1: Merit Grants & Fee Schedules",
+      "documentVersion": "v2.0"
+    }
+  },
+  {
+    "chunkId": "chk-006",
+    "documentId": "doc-101",
+    "documentTitle": "2024 Student Handbook",
+    "content": "Library Regulations & Late Overdue Fines: Standard book loan duration is 14 days for undergraduate students and 30 days for graduate students. Overdue loans incur a late fee of $1.50 per day per item. Reference materials, course reserve textbooks, and special archive copies cannot be checked out overnight.",
+    "embedding": [0.05, -0.50, 0.30, 0.15, 0.60, -0.40, 0.25, -0.10, 0.80, 0.20],
+    "metadata": {
+      "pageNumber": 88,
+      "section": "Section 7.3: Library Rules and Fines",
+      "documentVersion": "v2.4"
+    }
+  },
+  {
+    "chunkId": "chk-007",
+    "documentId": "doc-106",
+    "documentTitle": "IT Services & Campus Wi-Fi Manual",
+    "content": "Campus Wi-Fi & Network Access: Students can connect to the encrypted network 'Hypervisor-Secure' using their Student ID number and portal password. Multi-factor authentication (MFA) is required for portal access. For tech support, visit IT Helpdesk in Technology Center Room 204 or email it-support@hypervisor.edu.",
+    "embedding": [-0.15, 0.80, 0.10, -0.40, 0.25, 0.60, -0.10, 0.35, -0.50, 0.40],
+    "metadata": {
+      "pageNumber": 6,
+      "section": "Section 1.2: Student Network Credentials",
+      "documentVersion": "v1.0"
+    }
+  },
+  {
+    "chunkId": "chk-008",
+    "documentId": "doc-107",
+    "documentTitle": "Academic Grading & Probation Policy",
+    "content": "Grading Scale & Academic Standing: Cumulative GPA is calculated on a 4.0 scale (A=4.0, B=3.0, C=2.0, D=1.0, F=0.0). Students falling below a cumulative 2.0 GPA at the end of any term are placed on Academic Probation and restricted to maximum 12 credit hours. Course repeat options allow replacing up to two failing grades.",
+    "embedding": [0.60, -0.20, 0.40, 0.30, -0.15, 0.10, 0.50, -0.40, 0.20, 0.35],
+    "metadata": {
+      "pageNumber": 45,
+      "section": "Section 5.1: GPA Requirements & Probation",
+      "documentVersion": "v3.2"
+    }
+  },
+  {
+    "chunkId": "chk-009",
+    "documentId": "doc-108",
+    "documentTitle": "Graduation & Degree Completion Policy",
+    "content": "Graduation Requirements & Credit Thresholds: Candidates for Bachelor's degrees must complete a minimum of 120 total semester credits, including at least 30 upper-division credits in their major, complete the Senior Capstone Project, and maintain a cumulative GPA of 2.0 or higher. Graduation audit petitions must be submitted two semesters prior to anticipated completion.",
+    "embedding": [0.30, 0.10, -0.50, 0.70, 0.20, -0.30, 0.40, 0.15, 0.65, -0.10],
+    "metadata": {
+      "pageNumber": 22,
+      "section": "Section 8.0: Degree Completion Audits",
+      "documentVersion": "v2.1"
+    }
+  },
+  {
+    "chunkId": "chk-010",
+    "documentId": "doc-109",
+    "documentTitle": "International Student Visa & Immigration Guide",
+    "content": "F-1 Visa Compliance & Travel Endorsements: International students must maintain full-time course load (minimum 12 credits for undergraduates, 9 for graduates) every mandatory semester. Form I-20 travel signatures are valid for one year and must be renewed at the International Student Office prior to overseas travel.",
+    "embedding": [-0.40, 0.30, 0.20, 0.50, -0.60, 0.45, -0.20, 0.80, -0.35, 0.10],
+    "metadata": {
+      "pageNumber": 9,
+      "section": "Section 2.3: Maintenance of Status & Travel",
+      "documentVersion": "v1.5"
+    }
+  }
+]

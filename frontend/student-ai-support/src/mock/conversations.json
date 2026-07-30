@@ -1,0 +1,145 @@
+[
+  {
+    "id": "chat-001",
+    "title": "Admissions & Scholarship Query",
+    "category": "Academic",
+    "lastMessage": "Could you explain the eligibility criteria for the Academic Merit Scholarship for the upcoming 2024 fall semester?",
+    "updatedAt": "2 hours ago",
+    "messageCount": 2,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-002",
+    "title": "Semester 2 Calendar",
+    "category": "Academic",
+    "lastMessage": "What are the exact start and end dates for semester 2 examination period?",
+    "updatedAt": "5 hours ago",
+    "messageCount": 4,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-003",
+    "title": "Library Late Fees Policy",
+    "category": "Student Affairs",
+    "lastMessage": "What is the daily penalty fee for overdue library reference materials?",
+    "updatedAt": "1 day ago",
+    "messageCount": 3,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-004",
+    "title": "Dormitory Maintenance Request",
+    "category": "Housing",
+    "lastMessage": "How do I report a malfunctioning digital door lock in Residence Hall B?",
+    "updatedAt": "1 day ago",
+    "messageCount": 5,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-005",
+    "title": "Student Handbook Overview",
+    "category": "General",
+    "lastMessage": "Summary of academic integrity guidelines and disciplinary procedures.",
+    "updatedAt": "4 days ago",
+    "messageCount": 6,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-006",
+    "title": "Degree Audit Inquiry",
+    "category": "Academic",
+    "lastMessage": "Hello, I wanted to confirm if the credits from my summer internship have been processed.",
+    "updatedAt": "Oct 24, 2023",
+    "messageCount": 8,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-007",
+    "title": "Hostel Key Replacement",
+    "category": "Housing",
+    "lastMessage": "The digital lock on my door is not responding to my student ID card today...",
+    "updatedAt": "Oct 22, 2023",
+    "messageCount": 4,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-008",
+    "title": "Scholarship Disbursement",
+    "category": "Finance",
+    "lastMessage": "When will the Merit Scholarship reflect in the portal for the winter term?",
+    "updatedAt": "Oct 19, 2023",
+    "messageCount": 5,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-009",
+    "title": "Advanced Quantum Mechanics Syllabus Restructuring",
+    "category": "Research",
+    "lastMessage": "Based on the latest pedagogical standards from MIT, here are three suggested modules for the second-semester...",
+    "updatedAt": "Oct 12, 2023",
+    "messageCount": 24,
+    "isPinned": true,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-010",
+    "title": "Budget Allocation Discrepancy Inquiry",
+    "category": "Finance",
+    "lastMessage": "I have analyzed the Q3 spending reports against the projected Faculty of Science endowment. The discrepancy appears...",
+    "updatedAt": "Yesterday",
+    "messageCount": 8,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-011",
+    "title": "Student Feedback Sentiment Analysis",
+    "category": "Student Affairs",
+    "lastMessage": "Overall sentiment for the new hybrid learning model is 82% positive, with specific praise for the accessibility features...",
+    "updatedAt": "Oct 08, 2023",
+    "messageCount": 42,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-012",
+    "title": "Campus Expansion Architectural Draft Review",
+    "category": "Operations",
+    "lastMessage": "I've reviewed the structural integrity of the proposed glass atrium. There are some concerns regarding thermal efficiency...",
+    "updatedAt": "Oct 05, 2023",
+    "messageCount": 12,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  },
+  {
+    "id": "chat-013",
+    "title": "Legal Compliance: Privacy Policy Update",
+    "category": "Legal",
+    "lastMessage": "Drafting the mandatory GDPR/CCPA addendum for the student portal. The following sections need immediate faculty approval...",
+    "updatedAt": "Sep 28, 2023",
+    "messageCount": 5,
+    "isPinned": false,
+    "isArchived": false,
+    "model": "GPT-4o + RAG Model (Bedrock Simulated)"
+  }
+]

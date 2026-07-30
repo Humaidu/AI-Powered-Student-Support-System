@@ -1,0 +1,104 @@
+[
+  {
+    "id": "doc-101",
+    "title": "2024 Student Handbook",
+    "fileName": "2024_Student_Handbook.pdf",
+    "fileUrl": "/docs/2024_Student_Handbook.pdf",
+    "status": "COMPLETED",
+    "approvalStatus": "APPROVED",
+    "metadata": {
+      "category": "Institutional Rules",
+      "department": "Student Affairs",
+      "author": "Registrar Office",
+      "version": "v2.4",
+      "pageCount": 145,
+      "uploadedAt": "2024-08-15T09:30:00Z",
+      "fileSize": "4.2 MB"
+    }
+  },
+  {
+    "id": "doc-102",
+    "title": "Admissions Policy & Scholarships",
+    "fileName": "Admissions_Policy_V3.pdf",
+    "fileUrl": "/docs/Admissions_Policy_V3.pdf",
+    "status": "COMPLETED",
+    "approvalStatus": "APPROVED",
+    "metadata": {
+      "category": "Academic Policy",
+      "department": "Admissions Committee",
+      "author": "Dean of Admissions",
+      "version": "v3.0",
+      "pageCount": 48,
+      "uploadedAt": "2024-09-01T14:15:00Z",
+      "fileSize": "1.8 MB"
+    }
+  },
+  {
+    "id": "doc-103",
+    "title": "Hostel & Residence Hall Guidelines",
+    "fileName": "Hostel_Residence_Rules_2024.pdf",
+    "fileUrl": "/docs/Hostel_Residence_Rules_2024.pdf",
+    "status": "COMPLETED",
+    "approvalStatus": "APPROVED",
+    "metadata": {
+      "category": "Housing",
+      "department": "Campus Facilities",
+      "author": "Housing Directorate",
+      "version": "v1.2",
+      "pageCount": 32,
+      "uploadedAt": "2024-09-10T11:00:00Z",
+      "fileSize": "2.1 MB"
+    }
+  },
+  {
+    "id": "doc-104",
+    "title": "Course Registration & Exam Timetable Guide",
+    "fileName": "Course_Registration_Exams_Guide.pdf",
+    "fileUrl": "/docs/Course_Registration_Exams_Guide.pdf",
+    "status": "COMPLETED",
+    "approvalStatus": "APPROVED",
+    "metadata": {
+      "category": "Academic",
+      "department": "Academic Records",
+      "author": "Examinations Board",
+      "version": "v4.1",
+      "pageCount": 28,
+      "uploadedAt": "2024-09-20T16:45:00Z",
+      "fileSize": "1.5 MB"
+    }
+  },
+  {
+    "id": "doc-105",
+    "title": "Tuition Fees & Merit Financial Aid Policy",
+    "fileName": "Tuition_Fees_Financial_Aid_2024.pdf",
+    "fileUrl": "/docs/Tuition_Fees_Financial_Aid_2024.pdf",
+    "status": "COMPLETED",
+    "approvalStatus": "APPROVED",
+    "metadata": {
+      "category": "Finance",
+      "department": "Bursar & Finance Office",
+      "author": "Financial Comptroller",
+      "version": "v2.0",
+      "pageCount": 56,
+      "uploadedAt": "2024-10-01T08:20:00Z",
+      "fileSize": "3.0 MB"
+    }
+  },
+  {
+    "id": "doc-106",
+    "title": "Faculty Research & Endowment Guidelines Draft",
+    "fileName": "Research_Endowment_Draft_2025.pdf",
+    "fileUrl": "/docs/Research_Endowment_Draft_2025.pdf",
+    "status": "PROCESSING",
+    "approvalStatus": "PENDING_REVIEW",
+    "metadata": {
+      "category": "Research",
+      "department": "Office of Vice-Chancellor",
+      "author": "Research Directorate",
+      "version": "v0.9-draft",
+      "pageCount": 72,
+      "uploadedAt": "2024-10-25T10:00:00Z",
+      "fileSize": "5.6 MB"
+    }
+  }
+]

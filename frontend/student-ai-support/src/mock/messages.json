@@ -1,0 +1,80 @@
+{
+  "chat-001": [
+    {
+      "id": "msg-101",
+      "sessionId": "chat-001",
+      "sender": "student",
+      "content": "Could you explain the eligibility criteria for the Academic Merit Scholarship for the upcoming 2024 fall semester? I'm particularly interested in the GPA requirements for international students.",
+      "timestamp": "10:14 AM"
+    },
+    {
+      "id": "msg-102",
+      "sessionId": "chat-001",
+      "sender": "assistant",
+      "content": "Based on the Hypervisor Educational Complex Admissions Policy for the 2024-2025 academic year, international students are eligible for the **Academic Merit Scholarship** under the following criteria:\n\n- **GPA Requirement:** A minimum cumulative GPA of 3.85 (on a 4.0 scale) or equivalent from your most recent degree.\n- **Standardized Tests:** SAT scores of 1450+ or ACT 32+ (optional but highly recommended for competitive ranking).\n- **Enrollment:** Must be enrolled in a minimum of 12 credits per semester as a full-time student.\n- **Deadlines:** Application must be submitted by July 15, 2024.",
+      "timestamp": "10:14 AM",
+      "ragVerification": {
+        "sourceCount": 3,
+        "sources": [
+          {
+            "document": "2024_Student_Handbook.pdf",
+            "documentId": "doc-101",
+            "page": 112,
+            "section": "Section 4.2: Financial Aid",
+            "confidence": 0.98,
+            "snippet": "International applicants demonstrating an outstanding academic record of 3.85 GPA or equivalent qualify for full merit tuition assistance..."
+          },
+          {
+            "document": "Admissions_Policy_V3.pdf",
+            "documentId": "doc-102",
+            "page": 18,
+            "section": "Appendix B: International Standards",
+            "confidence": 0.92,
+            "snippet": "Candidates must maintain full-time enrollment of at least 12 credit hours per semester..."
+          },
+          {
+            "document": "Tuition_Fees_Financial_Aid_2024.pdf",
+            "documentId": "doc-105",
+            "page": 14,
+            "section": "Section 2.1: Merit Grants",
+            "confidence": 0.89,
+            "snippet": "Merit aid applications close annually on July 15 for international fall intake."
+          }
+        ]
+      },
+      "suggestedFollowups": [
+        "How do I apply for this scholarship?",
+        "List required documents for international students",
+        "Are there sports-based scholarships?"
+      ]
+    }
+  ],
+  "chat-006": [
+    {
+      "id": "msg-601",
+      "sessionId": "chat-006",
+      "sender": "student",
+      "content": "Hello, I wanted to confirm if the credits from my summer internship have been processed into my transcript.",
+      "timestamp": "Oct 24, 2023 2:30 PM"
+    },
+    {
+      "id": "msg-602",
+      "sessionId": "chat-006",
+      "sender": "assistant",
+      "content": "According to the **Academic Records Department**, summer internship credit evaluations take 10-14 business days after employer evaluation submission. Your supervisor submitted the report on Oct 18, so your updated degree audit will reflect 3 units by Nov 2, 2023.",
+      "timestamp": "Oct 24, 2023 2:31 PM",
+      "ragVerification": {
+        "sourceCount": 1,
+        "sources": [
+          {
+            "document": "Course_Registration_Exams_Guide.pdf",
+            "documentId": "doc-104",
+            "page": 9,
+            "section": "Internship Credit Transfer",
+            "confidence": 0.95
+          }
+        ]
+      }
+    }
+  ]
+}

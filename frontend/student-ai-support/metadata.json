@@ -1,0 +1,6 @@
+{
+  "name": "Hypervisor Educational Complex",
+  "description": "AI Powered Student Support Platform for academic inquiries, RAG-guided institutional assistance, document management, and student services.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
