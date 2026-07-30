@@ -12,6 +12,7 @@ import json
 import os
 import sys
 import boto3
+from botocore.client import Config
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../shared"))
 
@@ -19,7 +20,14 @@ from auth import require_admin, AuthError
 from db import put_document_metadata, new_id
 from responses import created, bad_request, unauthorized, forbidden, server_error
 
-_s3 = boto3.client("s3")
+# signature_version="s3v4" is required here, not optional: the document
+# bucket enforces SSE-KMS encryption (see s3.tf), and S3 rejects
+# SigV2-signed requests against a KMS-encrypted bucket with
+# "Requests specifying Server Side Encryption with AWS KMS managed keys
+# require AWS Signature Version 4. every other region defaults to SigV4.
+# Without this Config, presigned URLs generated in us-east-1 fail with
+# exactly that S3 error the moment the browser tries to PUT the file.
+_s3 = boto3.client("s3", config=Config(signature_version="s3v4"))
 _BUCKET = os.environ["DOCUMENT_BUCKET"]
 _ALLOWED_MIME_TYPES = {
     "application/pdf": "pdf",

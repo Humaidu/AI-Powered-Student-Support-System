@@ -1,6 +1,7 @@
  # API Contract — AI-Powered Student Support Platform
 
-Base URL: `<api_endpoint from terraform output>` (e.g. `https://abc123.execute-api.eu-west-1.amazonaws.com`)
+Base URL: `https://dz8ce1v7da.execute-api.us-east-1.amazonaws.com` 
+
 All routes are prefixed with `/api/v1`.
 
 ## Authentication

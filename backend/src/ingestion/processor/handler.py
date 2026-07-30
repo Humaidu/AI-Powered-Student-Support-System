@@ -69,6 +69,7 @@ def _process_one_file(bucket: str, key: str) -> None:
         update_document(document_id, {"checksum": checksum, "processingStatus": "EMBEDDING"})
 
         chunks = _chunk_text(text)
+        indexed_count = 0
         for i, chunk_text in enumerate(chunks):
             try:
                 embedding = embed_text(chunk_text)
@@ -83,9 +84,24 @@ def _process_one_file(bucket: str, key: str) -> None:
                 embedding=embedding,
                 metadata={"pageNumber": None, "documentVersion": document.get("version", 1), "chunkIndex": i},
             )
+            indexed_count += 1
+        
+
+        # A document with 0 chunks actually indexed is NOT complete, even
+        # if every embedding call merely raised (rather than crashing the
+        # whole Lambda)
+        if indexed_count == 0:
+            update_document(document_id, {"processingStatus": "FAILED"})
+            print(f"Ingestion FAILED for documentId={document_id}: 0 of {len  (chunks)} chunks were indexed (every embedding call failed — check Bedrock access/model availability)")
+            return
 
         update_document(document_id, {"processingStatus": "COMPLETED"})
         print(f"Ingestion completed for documentId={document_id}: {len(chunks)} chunks indexed")
+        update_document(document_id, {"processingStatus": "COMPLETED"})
+        if indexed_count < len(chunks):
+            print(f"Ingestion completed for documentId={document_id} with PARTIAL coverage: {indexed_count}/{len(chunks)} chunks indexed")
+        else:
+            print(f"Ingestion completed for documentId={document_id}: {indexed_count}/{len(chunks)} chunks indexed")
 
     except Exception as exc:
         print(f"Ingestion failed for documentId={document_id}: {exc}")

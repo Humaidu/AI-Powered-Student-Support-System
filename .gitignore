@@ -1,2 +1,3 @@
 backend/build/
-
+backend/scripts/venv/
+terraform/backend/test.txt

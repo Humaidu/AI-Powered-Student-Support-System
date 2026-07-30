@@ -68,4 +68,7 @@ resource "aws_cognito_user_pool_client" "app" {
     id_token      = "minutes"
     refresh_token = "days"
   }
+
+  read_attributes  = ["email", "custom:role"]
+  write_attributes = ["email"]
 }

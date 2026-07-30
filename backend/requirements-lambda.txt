@@ -1,0 +1,16 @@
+# Packages actually needed *inside a Lambda zip* at runtime — NOT the same
+# list as requirements.txt, which also includes pytest/flake8 for local
+# dev. Bundling test/lint tools into a deployment package is dead weight
+# that only bloats cold-start size.
+#
+# boto3 is deliberately excluded: every Lambda runtime already ships a
+# recent boto3, so bundling our own is redundant.
+#
+# Not every function needs every package below — see
+# backend/scripts/package_lambdas.sh for which function gets which subset:
+#   - opensearch-py: only chat_send_message and ingestion_processor
+#     (both import shared/vector_store.py)
+#   - pypdf, python-docx: only ingestion_processor (text extraction)
+opensearch-py>=2.6
+pypdf>=4.0
+python-docx>=1.1
