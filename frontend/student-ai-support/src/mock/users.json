@@ -1,0 +1,22 @@
+[
+  {
+    "id": "student001",
+    "name": "James Wilson",
+    "email": "j.wilson@hypervisor.edu",
+    "role": "STUDENT",
+    "title": "Undergraduate",
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuAs-iaqeN3xdi1x_sPBdaomSQ-ab0TZ707LFzngstYljiEHoV_4261hIdq9ml8z2UrAI8Yu7ouWc0LL9mEFojtNhlx7NUESMcGwGKrXkFb7Y4x8SduAROJzWrP3YKwXo8dYjR-TdwPLJu39IxR0bRkcuyLGrPjl_Iua5oR1wr98oQHfHsS_PENPLb5nX5Rx67qeQgxZmS1NCf9TvoylpwNyYRSm9C9Mze-Y9bVTyCjbso9yvVXU-w6ZAi4P7EcZi64zeOi16zCFwrI",
+    "department": "Computer Science & Artificial Intelligence",
+    "token": "mock.jwt.token.student001"
+  },
+  {
+    "id": "admin001",
+    "name": "Prof. Adrian Voss",
+    "email": "a.voss@hypervisor.edu",
+    "role": "ADMIN",
+    "title": "Dean of Faculty",
+    "avatar": "https://lh3.googleusercontent.com/aida-public/AB6AXuCQ5NSMeEEG8gnTG2sJPPo1IE1FHSE9QuUOelJcvxLoCCfnBlGgMlqLBkysPPgdoNP-ULGzKbFpyzjmJy0gAwyE3qet7cw257XT5rINFa8nRO-r7jPS_7Qzx9zuZWCe6UeR4aBHo7M1tqQHiwgQYLojhCJDY4mhjJ6f6GRk006E8wx2De_mzdCXCcvrbwflT8QV6GDB4FTvq3eteAnJzpuj0oTCR4XB8KekTJhn9InRIHfMXuFxRFpNnwd6eamzB2Zm8B2cMNOb2fw",
+    "department": "Academic Affairs & Administration",
+    "token": "mock.jwt.token.admin001"
+  }
+]
