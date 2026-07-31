@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -6,6 +7,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../shared"))
 from auth import get_role, AuthError
 from db import get_document
 from responses import ok, unauthorized, not_found, server_error
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
@@ -20,7 +24,8 @@ def lambda_handler(event, context):
 
     try:
         document = get_document(document_id)
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to fetch document %s: %s", document_id, exc)
         return server_error("Failed to fetch document")
 
     if not document:

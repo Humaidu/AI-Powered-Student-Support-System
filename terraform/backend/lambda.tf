@@ -10,7 +10,7 @@
 
 locals {
   lambda_runtime = "python3.12"
-  lambda_timeout = 15
+  lambda_timeout = 60
   lambda_memory  = 256
 
   # Common env vars every function gets, regardless of what it does —
@@ -22,6 +22,8 @@ locals {
     OPENSEARCH_ENDPOINT        = aws_opensearchserverless_collection.vectors.collection_endpoint
     BEDROCK_MODEL_ID           = var.bedrock_generation_model_id
     BEDROCK_EMBEDDING_MODEL_ID = var.bedrock_embedding_model_id
+    AI_PROVIDER                 = var.ai_provider
+    GEMINI_API_KEY_SECRET_ARN   = aws_secretsmanager_secret.gemini_api_key.arn
   }
 
   # source_dir must match the backend/src/ folder path for each function.

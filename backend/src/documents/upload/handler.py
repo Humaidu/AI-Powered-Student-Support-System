@@ -9,6 +9,7 @@ The S3 event trigger then kicks off the ingestion pipeline (see
 ingestion/processor/handler.py).
 """
 import json
+import logging
 import os
 import sys
 import boto3
@@ -20,13 +21,14 @@ from auth import require_admin, AuthError
 from db import put_document_metadata, new_id
 from responses import created, bad_request, unauthorized, forbidden, server_error
 
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 # signature_version="s3v4" is required here, not optional: the document
 # bucket enforces SSE-KMS encryption (see s3.tf), and S3 rejects
 # SigV2-signed requests against a KMS-encrypted bucket with
 # "Requests specifying Server Side Encryption with AWS KMS managed keys
-# require AWS Signature Version 4. every other region defaults to SigV4.
-# Without this Config, presigned URLs generated in us-east-1 fail with
-# exactly that S3 error the moment the browser tries to PUT the file.
+# require AWS Signature Version 4.
 _s3 = boto3.client("s3", config=Config(signature_version="s3v4"))
 _BUCKET = os.environ["DOCUMENT_BUCKET"]
 _ALLOWED_MIME_TYPES = {
@@ -79,7 +81,8 @@ def lambda_handler(event, context):
             Params={"Bucket": _BUCKET, "Key": s3_key, "ContentType": mime_type},
             ExpiresIn=_UPLOAD_URL_EXPIRY_SECONDS,
         )
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to generate presigned upload URL for s3Key=%s: %s", s3_key, exc)
         return server_error("Failed to generate upload URL")
 
     item = {
@@ -104,7 +107,8 @@ def lambda_handler(event, context):
 
     try:
         put_document_metadata(item)
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to save document metadata for documentId=%s: %s", document_id, exc)
         return server_error("Failed to save document metadata")
 
     return created({

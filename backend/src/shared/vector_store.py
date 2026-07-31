@@ -13,7 +13,7 @@ _INDEX_NAME = "document-chunks"
 
 def _client() -> OpenSearch:
     endpoint = os.environ["OPENSEARCH_ENDPOINT"].replace("https://", "")
-    region = os.environ.get("AWS_REGION", "eu-west-1")
+    region = os.environ.get("AWS_REGION", "us-east-1")
     credentials = boto3.Session().get_credentials()
     auth = AWSV4SignerAuth(credentials, region, "aoss")  # "aoss" = OpenSearch Serverless service code
 
@@ -24,14 +24,45 @@ def _client() -> OpenSearch:
         verify_certs=True,
         connection_class=RequestsHttpConnection,
         pool_maxsize=10,
+        timeout=30
     )
 
+ 
+def delete_chunks_for_document(document_id: str) -> int:
+    """Deletes every previously-indexed chunk for a document. Called by the
+    ingestion worker at the START of processing (see
+    ingestion/processor/handler.py), so re-ingesting the same document
+    (e.g. after a retry, or a future re-upload flow) doesn't accumulate
+    duplicate chunks alongside the old ones.
+ 
+    Returns the number of chunks deleted.
+ 
+    """
+    client = _client()
+ 
+    response = client.search(
+        index=_INDEX_NAME,
+        body={
+            "size": 1000,  # generous — a single small document won't have anywhere near this many chunks
+            "query": {"term": {"documentId": document_id}},
+            "_source": False,  # only need the _id, not the full document body
+        },
+    )
+    hits = response.get("hits", {}).get("hits", [])
+    if not hits:
+        return 0
+ 
+    bulk_body = []
+    for hit in hits:
+        bulk_body.append({"delete": {"_index": _INDEX_NAME, "_id": hit["_id"]}})
+    client.bulk(body=bulk_body)
+ 
+    return len(hits)
 
 def index_chunk(chunk_id: str, document_id: str, content: str, embedding: list, metadata: dict) -> None:
     """Called by the ingestion worker for every chunk of a processed document."""
     _client().index(
         index=_INDEX_NAME,
-        id=chunk_id,
         body={
             "chunkId": chunk_id,
             "documentId": document_id,

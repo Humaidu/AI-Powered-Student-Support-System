@@ -1,3 +1,6 @@
 backend/build/
 backend/scripts/venv/
 terraform/backend/test.txt
+terraform/backend/test*.txt
+backend/scripts/__pycache__ 
+*/__pycache__

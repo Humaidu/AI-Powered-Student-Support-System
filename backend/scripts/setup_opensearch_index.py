@@ -110,7 +110,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--endpoint", help="OpenSearch Serverless collection endpoint (with or without https://)")
     parser.add_argument("--auto", action="store_true", help="Read the endpoint from `terraform output` instead of passing it manually")
-    parser.add_argument("--region", default="eu-west-1", help="AWS region the collection is in (default: eu-west-1)")
+    parser.add_argument("--region", default="us-east-1", help="AWS region the collection is in (default: us-east-1)")
     parser.add_argument("--dimensions", type=int, default=1024, help="Embedding vector size — must match embedding_dimensions in terraform/backend/variables.tf (default: 1024, for Titan Text Embeddings V2)")
     parser.add_argument("--force", action="store_true", help="Delete and recreate the index if it already exists (DESTROYS existing indexed chunks)")
     args = parser.parse_args()

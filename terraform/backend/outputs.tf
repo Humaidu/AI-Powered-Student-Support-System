@@ -29,3 +29,8 @@ output "cognito_app_client_id" {
   description = "Needed by the frontend to configure its Cognito auth SDK"
   value       = aws_cognito_user_pool_client.app.id
 }
+
+output "gemini_api_key_secret_arn" {
+  description = "Set the key with: aws secretsmanager put-secret-value --secret-id <this ARN> --secret-string \"<your key>\""
+  value       = aws_secretsmanager_secret.gemini_api_key.arn
+}

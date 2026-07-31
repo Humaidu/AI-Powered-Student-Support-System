@@ -5,6 +5,7 @@ Available to any authenticated user, but students only ever see APPROVED
 documents (they shouldn't see pending/rejected uploads still in review).
 Admins can pass ?status=PENDING_REVIEW to see everything awaiting action.
 """
+import logging
 import os
 import sys
 
@@ -13,6 +14,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../shared"))
 from auth import get_role, AuthError
 from db import list_documents
 from responses import ok, unauthorized, server_error
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
@@ -26,7 +30,8 @@ def lambda_handler(event, context):
 
     try:
         documents = list_documents()
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to list documents: %s", exc)
         return server_error("Failed to list documents")
 
     if role != "ADMIN":

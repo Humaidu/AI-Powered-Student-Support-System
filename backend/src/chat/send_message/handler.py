@@ -17,6 +17,7 @@ not a RAG-logic change.
 """
 import json
 import os
+import logging
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "../../shared"))
@@ -26,6 +27,9 @@ from db import get_session_owner, put_message
 from ai_client import embed_text, generate_answer, AIServiceError
 from vector_store import search
 from responses import created, bad_request, unauthorized, forbidden, not_found, server_error
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 _TOP_K = 5
 _MAX_QUESTION_LENGTH = 1000
@@ -61,23 +65,26 @@ def lambda_handler(event, context):
     # 1. Embed the question
     try:
         query_embedding = embed_text(question)
-    except AIServiceError:
+    except AIServiceError as exc:
+        logger.error("Embedding failed for question in session %s: %s", session_id, exc)
         return server_error("The AI service is temporarily unavailable. Please try again shortly.")
 
     # 2. Vector search for the top-K most relevant document chunks
     try:
         chunks = search(query_embedding, top_k=_TOP_K)
-    except Exception:
+    except Exception as exc:
         # Vector search failing shouldn't crash the whole request — fall
         # through with zero chunks, which forces the standard "I couldn't
-        # find this" response rather than an unrelated 500.
+        # find this" response rather than an unrelated 500. Still logged.
+        logger.error("Vector search failed for session %s, falling back to 0 chunks: %s", session_id, exc)
         chunks = []
 
     # 3. Generate a grounded answer (or the no-answer message if nothing
     #    relevant was retrieved — see ai_client.generate_answer)
     try:
         answer = generate_answer(question, chunks)
-    except AIServiceError:
+    except AIServiceError as exc:
+        logger.error("Answer generation failed for session %s: %s", session_id, exc)
         return server_error("The AI service is temporarily unavailable. Please try again shortly.")
 
     sources = [
@@ -88,7 +95,8 @@ def lambda_handler(event, context):
     try:
         put_message(session_id, role="user", content=question)
         assistant_message = put_message(session_id, role="assistant", content=answer, sources=sources)
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to save conversation for session %s: %s", session_id, exc)
         return server_error("Failed to save the conversation")
 
     return created({

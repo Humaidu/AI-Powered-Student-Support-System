@@ -1,22 +1,16 @@
 """
-Two separate Bedrock calls happen in the RAG pipeline:
-  1. Embed the student's question (Titan Text Embeddings V2) to search OpenSearch.
-  2. Generate the answer (Claude via Bedrock), grounded in the retrieved chunks.
+Two AI calls happen in the RAG pipeline, regardless of provider:
+  1. Embed the student's question, to search OpenSearch.
+  2. Generate the answer, grounded in the retrieved chunks.
 
-ARCHITECTURE.md section 13 sets hard rules for the assistant: answer only
-from institutional documents, refuse unsupported questions, include source
-references, never invent information. Those rules live in SYSTEM_PROMPT
-below and are enforced by not calling the model at all if nothing relevant
-was retrieved (see chat/send_message/handler.py).
 """
 import json
 import os
+import urllib.request
+import urllib.error
 import boto3
 
-_bedrock = boto3.client("bedrock-runtime")
-
-_GENERATION_MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20240620-v1:0")
-_EMBEDDING_MODEL_ID = os.environ.get("BEDROCK_EMBEDDING_MODEL_ID", "amazon.titan-embed-text-v2:0")
+_PROVIDER = os.environ.get("AI_PROVIDER", "bedrock")
 
 NO_ANSWER_MESSAGE = (
     "I could not find this information in the available institutional "
@@ -37,13 +31,47 @@ class AIServiceError(Exception):
     pass
 
 
+# ---------------------------------------------------------------------------
+# Public API — used by chat/send_message and ingestion/processor. Neither
+# handler branches on provider; all of that lives below this line.
+# ---------------------------------------------------------------------------
+
 def embed_text(text: str) -> list[float]:
-    """Generates a vector embedding for a piece of text (question or chunk)
-    using Titan Text Embeddings V2. Used both at ingestion time (embedding
-    document chunks) and at query time (embedding the student's question)."""
+    if _PROVIDER == "gemini":
+        return _gemini_embed(text)
+    return _bedrock_embed(text)
+
+
+def generate_answer(question: str, context_chunks: list[dict]) -> str:
+    if not context_chunks:
+        return NO_ANSWER_MESSAGE
+
+    if _PROVIDER == "gemini":
+        return _gemini_generate(question, context_chunks)
+    return _bedrock_generate(question, context_chunks)
+
+
+def _build_context_text(context_chunks: list[dict]) -> str:
+    return "\n\n".join(
+        f"[Excerpt {i + 1} — document {c['documentId']}, page {c.get('pageNumber', '?')}]\n{c['content']}"
+        for i, c in enumerate(context_chunks)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Bedrock (the locked-architecture provider)
+# ---------------------------------------------------------------------------
+
+_bedrock = boto3.client("bedrock-runtime") if _PROVIDER == "bedrock" else None
+
+_BEDROCK_GENERATION_MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")
+_BEDROCK_EMBEDDING_MODEL_ID = os.environ.get("BEDROCK_EMBEDDING_MODEL_ID", "amazon.titan-embed-text-v2:0")
+
+
+def _bedrock_embed(text: str) -> list[float]:
     try:
         response = _bedrock.invoke_model(
-            modelId=_EMBEDDING_MODEL_ID,
+            modelId=_BEDROCK_EMBEDDING_MODEL_ID,
             body=json.dumps({"inputText": text}),
             contentType="application/json",
             accept="application/json",
@@ -51,23 +79,11 @@ def embed_text(text: str) -> list[float]:
         payload = json.loads(response["body"].read())
         return payload["embedding"]
     except Exception as exc:
-        raise AIServiceError(f"Embedding generation failed: {exc}") from exc
+        raise AIServiceError(f"Bedrock embedding generation failed: {exc}") from exc
 
 
-def generate_answer(question: str, context_chunks: list[dict]) -> str:
-    """context_chunks: list of {"content": str, "documentId": str, "pageNumber": int}
-    retrieved from OpenSearch (see shared/vector_store.py). If the list is
-    empty, we skip the model call entirely and return the standard
-    no-answer message — that's a stronger hallucination guard than trusting
-    the model to refuse on its own."""
-    if not context_chunks:
-        return NO_ANSWER_MESSAGE
-
-    context_text = "\n\n".join(
-        f"[Excerpt {i + 1} — document {c['documentId']}, page {c.get('pageNumber', '?')}]\n{c['content']}"
-        for i, c in enumerate(context_chunks)
-    )
-
+def _bedrock_generate(question: str, context_chunks: list[dict]) -> str:
+    context_text = _build_context_text(context_chunks)
     body = {
         "anthropic_version": "bedrock-2023-05-31",
         "max_tokens": 600,
@@ -76,10 +92,9 @@ def generate_answer(question: str, context_chunks: list[dict]) -> str:
             {"role": "user", "content": f"Document excerpts:\n\n{context_text}\n\nStudent question: {question}"}
         ],
     }
-
     try:
         response = _bedrock.invoke_model(
-            modelId=_GENERATION_MODEL_ID,
+            modelId=_BEDROCK_GENERATION_MODEL_ID,
             body=json.dumps(body),
             contentType="application/json",
             accept="application/json",
@@ -92,3 +107,78 @@ def generate_answer(question: str, context_chunks: list[dict]) -> str:
         return payload["content"][0]["text"]
     except (KeyError, IndexError) as exc:
         raise AIServiceError(f"Unexpected Bedrock response shape: {payload}") from exc
+
+
+# ---------------------------------------------------------------------------
+# Gemini 
+# ---------------------------------------------------------------------------
+
+_GEMINI_GENERATION_MODEL = os.environ.get("GEMINI_GENERATION_MODEL", "gemini-3.6-flash")
+_GEMINI_EMBEDDING_MODEL = os.environ.get("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
+# 768 keeps the vector small and matches --dimensions 768 on
+# setup_opensearch_index.py — Gemini's embedding model supports scaling
+# output size down from its 3072 default via this parameter.
+_GEMINI_EMBEDDING_DIMENSIONS = int(os.environ.get("GEMINI_EMBEDDING_DIMENSIONS", "768"))
+
+_secrets_client = boto3.client("secretsmanager") if _PROVIDER == "gemini" else None
+_cached_gemini_api_key = None
+
+
+def _get_gemini_api_key() -> str:
+    """Fetched from Secrets Manager at runtime (once, then cached for the
+    life of the Lambda execution environment) rather than sitting in a
+    plaintext Lambda environment variable — see terraform/backend/secrets.tf."""
+    global _cached_gemini_api_key
+    if _cached_gemini_api_key is None:
+        secret_arn = os.environ["GEMINI_API_KEY_SECRET_ARN"]
+        response = _secrets_client.get_secret_value(SecretId=secret_arn)
+        _cached_gemini_api_key = response["SecretString"]
+    return _cached_gemini_api_key
+
+
+def _gemini_request(url: str, body: dict) -> dict:
+    api_key = _get_gemini_api_key()
+    req = urllib.request.Request(
+        f"{url}?key={api_key}",
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            return json.loads(resp.read())
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="ignore")
+        raise AIServiceError(f"Gemini API error ({exc.code}): {error_body}") from exc
+    except Exception as exc:
+        raise AIServiceError(f"Gemini request failed: {exc}") from exc
+
+
+def _gemini_embed(text: str) -> list[float]:
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{_GEMINI_EMBEDDING_MODEL}:embedContent"
+    body = {
+        "content": {"parts": [{"text": text}]},
+        "outputDimensionality": _GEMINI_EMBEDDING_DIMENSIONS,
+    }
+    payload = _gemini_request(url, body)
+    try:
+        return payload["embedding"]["values"]
+    except KeyError as exc:
+        raise AIServiceError(f"Unexpected Gemini embedding response shape: {payload}") from exc
+
+
+def _gemini_generate(question: str, context_chunks: list[dict]) -> str:
+    context_text = _build_context_text(context_chunks)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{_GEMINI_GENERATION_MODEL}:generateContent"
+    body = {
+        "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+        "contents": [
+            {"role": "user", "parts": [{"text": f"Document excerpts:\n\n{context_text}\n\nStudent question: {question}"}]}
+        ],
+        "generationConfig": {"maxOutputTokens": 600},
+    }
+    payload = _gemini_request(url, body)
+    try:
+        return payload["candidates"][0]["content"]["parts"][0]["text"]
+    except (KeyError, IndexError) as exc:
+        raise AIServiceError(f"Unexpected Gemini generation response shape: {payload}") from exc
