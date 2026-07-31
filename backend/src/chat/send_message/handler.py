@@ -47,7 +47,7 @@ def lambda_handler(event, context):
         return bad_request("Request body must be valid JSON")
 
     session_id = body.get("sessionId")
-    question = (body.get("message") or "").strip()
+    question = (body.get("content") or body.get("message") or "").strip()
 
     if not session_id:
         return bad_request("sessionId is required")
@@ -62,6 +62,15 @@ def lambda_handler(event, context):
     if owner_id != user_id:
         return forbidden("This session belongs to a different user")
 
+    # Save the user's message BEFORE calling the AI service, not after. 
+    # Embedding/generation can legitimately fail (Bedrock/Gemini outage,
+    # rate limit, etc.) and return a 500
+    try:
+        put_message(session_id, role="user", content=question)
+    except Exception as exc:
+        logger.error("Failed to save user message for session %s: %s", session_id, exc)
+        return server_error("Failed to save message")
+    
     # 1. Embed the question
     try:
         query_embedding = embed_text(question)
@@ -93,7 +102,6 @@ def lambda_handler(event, context):
     ]
 
     try:
-        put_message(session_id, role="user", content=question)
         assistant_message = put_message(session_id, role="assistant", content=answer, sources=sources)
     except Exception as exc:
         logger.error("Failed to save conversation for session %s: %s", session_id, exc)

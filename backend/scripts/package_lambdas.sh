@@ -23,7 +23,7 @@ mkdir -p build
 
 # Functions that only need boto3 (already provided by the Lambda runtime)
 # — no extra pip install needed for these.
-LIGHTWEIGHT_FUNCTIONS="documents_upload documents_list documents_get documents_delete documents_approve chat_create_session chat_get_sessions chat_get_messages chat_get_message feedback_submit"
+LIGHTWEIGHT_FUNCTIONS="documents_upload documents_list documents_get documents_delete chat_create_session chat_get_sessions chat_get_messages chat_get_message feedback_submit"
 
 for fn in $LIGHTWEIGHT_FUNCTIONS; do
   src_dir=$(echo "$fn" | sed 's/_/\//') # e.g. documents_upload -> documents/upload
@@ -49,6 +49,14 @@ cp src/shared/*.py build/ingestion_processor/
 pip install -r requirements-lambda.txt -t build/ingestion_processor --quiet
 echo "Packaged (with opensearch-py, pypdf, python-docx): ingestion_processor"
 
+# documents_approve imports vector_store.py for OpenSearch chunk updates
+# so it needs opensearch-py bundled.
+mkdir -p build/documents_approve
+cp src/documents/approve/handler.py build/documents_approve/
+cp src/shared/*.py build/documents_approve/
+pip install "opensearch-py>=2.6" -t build/documents_approve --quiet
+echo "Packaged (with opensearch-py): documents_approve"
+
 echo ""
 echo "Done. Built $(ls build | wc -l | tr -d ' ') function directories under $BACKEND_DIR/build/"
-echo "You can now run: cd terraform/backend && terraform apply"
+echo "You can now run: cd terraform/backend && terraform apply"a

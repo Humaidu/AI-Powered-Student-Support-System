@@ -98,7 +98,15 @@ def create_index(client: OpenSearch, dimensions: int, force: bool) -> None:
                             "space_type": "cosinesimil",
                         },
                     },
-                    "metadata": {"type": "object"},
+                    "metadata": {
+                        "type": "object",
+                        "properties": {
+                            "approvalStatus": {"type": "keyword"},
+                            "pageNumber": {"type": "integer"},
+                            "documentVersion": {"type": "integer"},
+                            "chunkIndex": {"type": "integer"},
+                        },
+                    },
                 }
             },
         },

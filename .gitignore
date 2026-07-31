@@ -4,3 +4,4 @@ terraform/backend/test.txt
 terraform/backend/test*.txt
 backend/scripts/__pycache__ 
 */__pycache__
+backend/Hypervisor_Educational_Complex_Documents.pdf

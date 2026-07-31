@@ -92,7 +92,7 @@ resource "aws_lambda_function" "ingestion_processor" {
   role             = aws_iam_role.lambda_exec.arn
   handler          = "handler.lambda_handler"
   runtime          = local.lambda_runtime
-  timeout          = 60  # PDF text extraction + embedding many chunks takes longer than a simple CRUD call
+  timeout          = 300  # PDF text extraction + embedding many chunks takes longer than a simple CRUD call
   memory_size      = 512 # PDF parsing libraries need more headroom than the API handlers
   filename         = data.archive_file.ingestion_processor.output_path
   source_code_hash = data.archive_file.ingestion_processor.output_base64sha256
