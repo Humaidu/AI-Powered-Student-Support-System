@@ -1,24 +1,22 @@
 import { VectorSearchProvider } from './vectorSearchProvider';
 import { VectorChunk, VectorSearchResult } from '../../types';
-import { config } from '../../config/environment';
+import { apiClient } from '../../api/client';
 
 export class OpenSearchProvider implements VectorSearchProvider {
   async search(query: string, topK: number = 5): Promise<VectorSearchResult[]> {
-    const response = await fetch(`${config.API_BASE_URL}/opensearch/knn-search`, {
+    const res = await apiClient<VectorSearchResult[]>('/opensearch/knn-search', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, topK })
     });
-    const res = await response.json();
     if (!res.success) throw new Error(res.error?.message || 'OpenSearch query failed');
-    return res.data;
+    return res.data || [];
   }
 
   async addChunk(chunk: VectorChunk): Promise<void> {
-    await fetch(`${config.API_BASE_URL}/opensearch/index-chunk`, {
+    const res = await apiClient<null>('/opensearch/index-chunk', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chunk })
     });
+    if (!res.success) throw new Error(res.error?.message || 'Failed to index chunk');
   }
 }

@@ -30,6 +30,22 @@ class AuthService {
   public async switchRole(role: UserRole): Promise<User> {
     return this.provider.switchRole(role);
   }
+
+  public async register(name: string, email: string, password: string, role?: UserRole): Promise<{ needsConfirmation: boolean }> {
+    return this.provider.register(name, email, password, role);
+  }
+
+  public async confirmRegistration(email: string, code: string): Promise<void> {
+    return this.provider.confirmRegistration(email, code);
+  }
+
+  public async forgotPassword(email: string): Promise<void> {
+    return this.provider.forgotPassword(email);
+  }
+
+  public async resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+    return this.provider.resetPassword(email, code, newPassword);
+  }
 }
 
 export const authService = new AuthService();

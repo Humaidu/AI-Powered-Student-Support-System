@@ -65,4 +65,35 @@ export class MockAuthProvider implements AuthProvider {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(targetUser));
     return targetUser;
   }
+
+  async register(name: string, email: string, _password: string, role: UserRole = 'STUDENT'): Promise<{ needsConfirmation: boolean }> {
+    await new Promise(res => setTimeout(res, 400));
+    const newUser: User = {
+      id: `user-${Date.now()}`,
+      name,
+      email,
+      role,
+      title: role === 'ADMIN' ? 'Administrator' : 'Undergraduate',
+      avatar: '',
+      department: 'Computer Science & Artificial Intelligence',
+      token: `mock.jwt.token.${Date.now()}`
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(newUser));
+    // Mock auto-confirms — no email verification needed
+    return { needsConfirmation: false };
+  }
+
+  async confirmRegistration(_email: string, _code: string): Promise<void> {
+    // No-op in mock mode
+  }
+
+  async forgotPassword(_email: string): Promise<void> {
+    await new Promise(res => setTimeout(res, 400));
+    // No-op in mock mode — pretend the email was sent
+  }
+
+  async resetPassword(_email: string, _code: string, _newPassword: string): Promise<void> {
+    await new Promise(res => setTimeout(res, 400));
+    // No-op in mock mode
+  }
 }
