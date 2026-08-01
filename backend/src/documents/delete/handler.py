@@ -6,6 +6,7 @@ see the note below — rather than silently deleting them, since a bulk
 delete-by-documentId query against OpenSearch needs its own handler and
 isn't in MVP scope per ARCHITECTURE.md.
 """
+import logging
 import os
 import sys
 import boto3
@@ -15,6 +16,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../shared"))
 from auth import require_admin, AuthError
 from db import get_document, delete_document, write_audit_log
 from responses import ok, forbidden, not_found, server_error
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 _s3 = boto3.client("s3")
 _BUCKET = os.environ["DOCUMENT_BUCKET"]
@@ -36,14 +40,16 @@ def lambda_handler(event, context):
 
     try:
         _s3.delete_object(Bucket=_BUCKET, Key=document["s3Key"])
-    except Exception:
+    except Exception as exc:
         # Continue even if the S3 object is already gone — don't block
-        # metadata cleanup on a storage-layer inconsistency.
-        pass
+        # metadata cleanup on a storage-layer inconsistency. Still logged,
+        # since a persistent (not one-off) failure here is worth noticing.
+        logger.warning("Failed to delete S3 object for documentId=%s: %s", document_id, exc)
 
     try:
         delete_document(document_id)
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to delete document metadata for documentId=%s: %s", document_id, exc)
         return server_error("Failed to delete document")
 
     # TODO (future enhancement): also purge this document's chunks from

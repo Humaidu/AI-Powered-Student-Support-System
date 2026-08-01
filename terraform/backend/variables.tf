@@ -37,9 +37,19 @@ variable "bedrock_embedding_model_id" {
 }
 
 variable "embedding_dimensions" {
-  description = "Vector size produced by the embedding model — must match the model exactly, or OpenSearch k-NN search will silently return nothing. Titan Text Embeddings V2 defaults to 1024."
+  description = "Vector size produced by the embedding model — must match the model exactly, or OpenSearch k-NN search will silently return nothing. Titan Text Embeddings V2 defaults to 1024. NOTE: if ai_provider=\"gemini\", this should be 768 instead (see ai_provider description) — this variable is NOT automatically synced with that switch, since it also drives the OpenSearch index setup script run separately."
   type        = number
   default     = 1024
+}
+
+variable "ai_provider" {
+  description = "TEMPORARY. \"bedrock\" (the locked architecture's actual provider) or \"gemini\" "
+  type        = string
+  default     = "bedrock"
+  validation {
+    condition     = contains(["bedrock", "gemini"], var.ai_provider)
+    error_message = "ai_provider must be either \"bedrock\" or \"gemini\"."
+  }
 }
 
 variable "log_retention_days" {

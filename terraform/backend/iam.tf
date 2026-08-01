@@ -101,7 +101,15 @@ data "aws_iam_policy_document" "lambda_permissions" {
     actions   = ["aoss:APIAccessAll"]
     resources = [aws_opensearchserverless_collection.vectors.arn]
   }
-
+  
+  # lets the Lambda read the Gemini API key at runtime instead of it sitting  # in plaintext as a Lambda environment variable. Harmless to leave in place # even when ai_provider="bedrock", since the secret's VALUE is set manually # and may just be empty/unused.
+  statement {
+    sid       = "TemporaryGeminiSecretAccess"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.gemini_api_key.arn]
+  }
+  
   # CloudWatch Logs — every Lambda needs this to write its own log
   # stream; without it, invocations still run but nothing is recorded.
   statement {
