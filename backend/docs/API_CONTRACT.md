@@ -241,7 +241,12 @@ this information..." message rather than a guess.
     "sessionId": "sess-uuid",
     "answer": "According to the Exam Regulations, appeals must be filed within 14 days of grade release.",
     "sources": [
-      { "documentId": "a1b2c3d4-...", "chunkId": "chunk-uuid", "pageNumber": 4 }
+      { 
+        "documentId": "a1b2c3d4-...", 
+        "documentTitle": "Student Handbook 2026",
+        "chunkId": "chunk-uuid", 
+        "pageNumber": 4 
+      }
     ],
     "createdAt": 1721990460
   }

@@ -18,12 +18,28 @@ NO_ANSWER_MESSAGE = (
 )
 
 SYSTEM_PROMPT = (
-    "You are an academic support assistant for a university. You must answer "
-    "ONLY using the provided document excerpts below — never use outside "
-    "knowledge, and never invent information not present in the excerpts. "
-    "If the excerpts don't contain enough information to answer confidently, "
-    f'respond with exactly: "{NO_ANSWER_MESSAGE}" '
-    "When you do answer, be concise and cite which excerpt(s) you used. Finish complete thoughts, cover the excerpts thoroughly, and avoid unnecessary padding."
+    "You are a friendly and helpful academic support assistant for Hypervisor Educational Complex. "
+    "Your primary role is to help students and faculty find information from our institutional documents.\n\n"
+    
+    "**Conversation Guidelines:**\n"
+    "1. Be warm and conversational - greet users, acknowledge their questions, and provide helpful context\n"
+    "2. For greetings (hi, hello, hey), general questions, or small talk, respond naturally and helpfully\n"
+    "3. For questions about institutional policies, procedures, or information:\n"
+    "   - ONLY use information from the provided document excerpts\n"
+    "   - Never invent or assume institutional information\n"
+    "   - If the excerpts don't contain the answer, say: "
+    f'"{NO_ANSWER_MESSAGE}"\n\n'
+    
+    "**Response Style:**\n"
+    "- Be concise but friendly\n"
+    "- Use natural language, not robotic phrases\n"
+    "- When citing documents, integrate references naturally into your response\n"
+    "- Offer to help with follow-up questions\n\n"
+    
+    "**Examples:**\n"
+    "- User: 'Hi' → 'Hello! I'm here to help you find information about Hypervisor Educational Complex. What can I help you with today?'\n"
+    "- User: 'Thanks!' → 'You're welcome! Let me know if you need anything else.'\n"
+    "- User: 'What's your favorite color?' → 'I don't have personal preferences, but I'm here to help you with information about our institution! What would you like to know?'\n"
 )
 
 
@@ -52,10 +68,32 @@ def generate_answer(question: str, context_chunks: list[dict]) -> str:
 
 
 def _build_context_text(context_chunks: list[dict]) -> str:
-    return "\n\n".join(
-        f"[Excerpt {i + 1} — document {c['documentId']}, page {c.get('pageNumber', '?')}]\n{c['content']}"
-        for i, c in enumerate(context_chunks)
-    )
+    """Build context with document titles for more natural AI citations.
+    
+    The AI can now say \"According to the Student Handbook...\" instead of
+    just \"According to excerpt 1...\" which makes responses more natural.
+    """
+    from db import get_document  # Import here to avoid circular dependency
+    
+    parts = []
+    doc_cache = {}  # Cache document metadata to avoid duplicate DB calls
+    
+    for i, chunk in enumerate(context_chunks):
+        doc_id = chunk['documentId']
+        
+        # Get document title (cached)
+        if doc_id not in doc_cache:
+            doc = get_document(doc_id)
+            doc_cache[doc_id] = doc.get('title', 'Institutional Document') if doc else 'Institutional Document'
+        
+        doc_title = doc_cache[doc_id]
+        page_info = f"page {chunk.get('pageNumber', '?')}"
+        
+        parts.append(
+            f"[Excerpt {i + 1} from {doc_title}, {page_info}]\\n{chunk['content']}"
+        )
+    
+    return "\\n\\n".join(parts)
 
 
 # ---------------------------------------------------------------------------
