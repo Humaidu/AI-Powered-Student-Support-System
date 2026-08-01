@@ -8,6 +8,7 @@ import { ConversationsPage } from "./pages/ConversationsPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { HelpPage } from "./pages/HelpPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { PublicWebsiteLayout } from "./pages/public/PublicWebsiteLayout";
 import { StudentRoute, AdminRoute } from "./routes/Guards";
 
 const queryClient = new QueryClient({
@@ -24,6 +25,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          {/* Public Website Homepage */}
+          <Route path="/" element={<PublicWebsiteLayout />} />
+
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -43,7 +47,7 @@ export default function App() {
           </Route>
 
           {/* Default Redirect */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

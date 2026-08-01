@@ -1,6 +1,6 @@
- # API Contract — AI-Powered Student Support Platform
+# API Contract — AI-Powered Student Support Platform
 
-Base URL: `https://dz8ce1v7da.execute-api.us-east-1.amazonaws.com` 
+Base URL: `https://dz8ce1v7da.execute-api.us-east-1.amazonaws.com`
 
 All routes are prefixed with `/api/v1`.
 
@@ -19,6 +19,7 @@ signature and expiry before the request ever reaches a Lambda; a
 missing/invalid/expired token gets a `401` before any handler code runs.
 
 Two roles exist, carried in the token as a custom claim:
+
 - `STUDENT` (default)
 - `ADMIN` — required for all document write actions (upload, delete, approve)
 
@@ -29,15 +30,17 @@ A request from a STUDENT token to an ADMIN-only route returns `403`.
 Every response, success or failure, follows the same shape.
 
 **Success:**
+
 ```json
 {
   "success": true,
   "message": "Human-readable summary",
-  "data": { }
+  "data": {}
 }
 ```
 
 **Error:**
+
 ```json
 {
   "success": false,
@@ -50,24 +53,25 @@ Every response, success or failure, follows the same shape.
 
 ## Common Error Codes
 
-| HTTP Status | Code | When |
-|---|---|---|
-| 400 | `BAD_REQUEST` | Missing/invalid field in the request body |
-| 400 | `UNSUPPORTED_FORMAT` | Document upload with a disallowed mimeType |
-| 400 | `FILE_TOO_LARGE` | Document upload exceeding 25MB |
-| 400 | `DOCUMENT_NOT_PROCESSED` | Approving a document before ingestion completed |
-| 401 | `UNAUTHORIZED` | Missing/invalid/expired token |
-| 403 | `FORBIDDEN` | Valid token, but wrong role or wrong resource owner |
-| 404 | `DOCUMENT_NOT_FOUND` | documentId doesn't exist (or isn't visible to this role) |
-| 404 | `SESSION_NOT_FOUND` | sessionId doesn't exist |
-| 404 | `MESSAGE_NOT_FOUND` | messageId doesn't exist |
-| 500 | `INTERNAL_ERROR` | Unhandled server-side failure (DynamoDB, S3, etc.) |
+| HTTP Status | Code                     | When                                                     |
+| ----------- | ------------------------ | -------------------------------------------------------- |
+| 400         | `BAD_REQUEST`            | Missing/invalid field in the request body                |
+| 400         | `UNSUPPORTED_FORMAT`     | Document upload with a disallowed mimeType               |
+| 400         | `FILE_TOO_LARGE`         | Document upload exceeding 25MB                           |
+| 400         | `DOCUMENT_NOT_PROCESSED` | Approving a document before ingestion completed          |
+| 401         | `UNAUTHORIZED`           | Missing/invalid/expired token                            |
+| 403         | `FORBIDDEN`              | Valid token, but wrong role or wrong resource owner      |
+| 404         | `DOCUMENT_NOT_FOUND`     | documentId doesn't exist (or isn't visible to this role) |
+| 404         | `SESSION_NOT_FOUND`      | sessionId doesn't exist                                  |
+| 404         | `MESSAGE_NOT_FOUND`      | messageId doesn't exist                                  |
+| 500         | `INTERNAL_ERROR`         | Unhandled server-side failure (DynamoDB, S3, etc.)       |
 
 ---
 
 ## Documents (Admin)
 
 ### `POST /api/v1/documents`
+
 **Role:** ADMIN only
 
 Creates the document's metadata record and returns a **pre-signed S3
@@ -75,6 +79,7 @@ upload URL**. The actual file is uploaded directly to S3 by the client, not
 sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
 
 **Request body:**
+
 ```json
 {
   "title": "Exam Regulations 2026",
@@ -87,18 +92,20 @@ sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
   "fileSize": 2457600
 }
 ```
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `title` | string | yes | |
-| `description` | string | no | |
-| `documentType` | string | no | free-form, e.g. "policy", "handbook" |
-| `department` | string | no | |
-| `academicYear` | string | no | |
-| `tags` | string[] | no | |
-| `mimeType` | string | yes | one of `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (docx), `text/plain` |
-| `fileSize` | integer | yes | bytes; max 25MB (26214400) |
+
+| Field          | Type     | Required | Notes                                                                                                                    |
+| -------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `title`        | string   | yes      |                                                                                                                          |
+| `description`  | string   | no       |                                                                                                                          |
+| `documentType` | string   | no       | free-form, e.g. "policy", "handbook"                                                                                     |
+| `department`   | string   | no       |                                                                                                                          |
+| `academicYear` | string   | no       |                                                                                                                          |
+| `tags`         | string[] | no       |                                                                                                                          |
+| `mimeType`     | string   | yes      | one of `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (docx), `text/plain` |
+| `fileSize`     | integer  | yes      | bytes; max 25MB (26214400)                                                                                               |
 
 **Response `201`:**
+
 ```json
 {
   "success": true,
@@ -115,6 +122,7 @@ sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
 
 <a id="document-upload-flow"></a>
 **Full upload flow (frontend implementation notes):**
+
 1. Call `POST /api/v1/documents` with metadata → get back `uploadUrl`
 2. `PUT` the raw file bytes directly to `uploadUrl`, with `Content-Type` header matching the `mimeType` you sent in step 1. The URL expires in 300 seconds — start the upload immediately.
 3. The file lands in S3, which triggers backend ingestion automatically (text extraction → chunking → embedding). No further frontend action needed.
@@ -124,6 +132,7 @@ sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
 ---
 
 ### `GET /api/v1/documents`
+
 **Role:** any authenticated user (STUDENT sees only approved documents; ADMIN sees everything and can filter)
 
 **Query params (ADMIN only):**
@@ -132,6 +141,7 @@ sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
 | `approvalStatus` | filter by `PENDING_REVIEW` \| `APPROVED` \| `REJECTED`. Ignored for STUDENT callers, who always only see `APPROVED` + `ACTIVE`. |
 
 **Response `200`:**
+
 ```json
 {
   "success": true,
@@ -160,6 +170,7 @@ sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
 ---
 
 ### `GET /api/v1/documents/{documentId}`
+
 **Role:** any authenticated user (STUDENT gets `404` for non-approved documents, same as if they didn't exist — this is intentional, not a bug: it avoids leaking the existence of unapproved content)
 
 **Response `200`:** full document metadata object (all fields from the schema in `ARCHITECTURE.md` section 11, except internal DynamoDB keys).
@@ -167,6 +178,7 @@ sent through this endpoint — see [Upload Flow](#document-upload-flow) below.
 ---
 
 ### `DELETE /api/v1/documents/{documentId}`
+
 **Role:** ADMIN only
 
 Deletes the metadata record and the S3 object. Does **not** currently purge
@@ -175,21 +187,32 @@ comments) — a deleted document's old chunks could theoretically still
 surface in search results until that's addressed.
 
 **Response `200`:**
+
 ```json
-{ "success": true, "message": "Document deleted", "data": { "documentId": "a1b2c3d4-..." } }
+{
+  "success": true,
+  "message": "Document deleted",
+  "data": { "documentId": "a1b2c3d4-..." }
+}
 ```
 
 ---
 
 ### `POST /api/v1/documents/{documentId}/approve`
+
 **Role:** ADMIN only
 
 Requires `processingStatus == "COMPLETED"` first — returns `400
 DOCUMENT_NOT_PROCESSED` otherwise.
 
 **Response `200`:**
+
 ```json
-{ "success": true, "message": "Document approved", "data": { "documentId": "a1b2c3d4-...", "approvalStatus": "APPROVED" } }
+{
+  "success": true,
+  "message": "Document approved",
+  "data": { "documentId": "a1b2c3d4-...", "approvalStatus": "APPROVED" }
+}
 ```
 
 ---
@@ -197,6 +220,7 @@ DOCUMENT_NOT_PROCESSED` otherwise.
 ## Chat
 
 ### `POST /api/v1/chat/sessions`
+
 **Role:** any authenticated user
 
 Creates a new chat session, scoped to the caller.
@@ -204,13 +228,19 @@ Creates a new chat session, scoped to the caller.
 **Request body:** none
 
 **Response `201`:**
+
 ```json
-{ "success": true, "message": "Operation successful", "data": { "sessionId": "sess-uuid", "createdAt": 1721990400 } }
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { "sessionId": "sess-uuid", "createdAt": 1721990400 }
+}
 ```
 
 ---
 
 ### `POST /api/v1/chat`
+
 **Role:** any authenticated user (must own the `sessionId` used)
 
 The core RAG endpoint. Embeds the question, searches indexed document
@@ -220,18 +250,21 @@ nothing relevant is found, `answer` will be the standard "I could not find
 this information..." message rather than a guess.
 
 **Request body:**
+
 ```json
 {
   "sessionId": "sess-uuid",
   "message": "When is the deadline to appeal an exam grade?"
 }
 ```
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `sessionId` | string | yes | must belong to the caller |
-| `message` | string | yes | max 1000 characters |
+
+| Field       | Type   | Required | Notes                     |
+| ----------- | ------ | -------- | ------------------------- |
+| `sessionId` | string | yes      | must belong to the caller |
+| `message`   | string | yes      | max 1000 characters       |
 
 **Response `201`:**
+
 ```json
 {
   "success": true,
@@ -241,21 +274,23 @@ this information..." message rather than a guess.
     "sessionId": "sess-uuid",
     "answer": "According to the Exam Regulations, appeals must be filed within 14 days of grade release.",
     "sources": [
-      { 
-        "documentId": "a1b2c3d4-...", 
+      {
+        "documentId": "a1b2c3d4-...",
         "documentTitle": "Student Handbook 2026",
-        "chunkId": "chunk-uuid", 
-        "pageNumber": 4 
+        "chunkId": "chunk-uuid",
+        "pageNumber": 4
       }
     ],
     "createdAt": 1721990460
   }
 }
 ```
+
 **Note on latency:** this endpoint does an embedding call + vector search
-+ generation call sequentially — expect this to be noticeably slower
-(seconds, not milliseconds) than the other endpoints. Design loading
-states in the frontend accordingly.
+
+- generation call sequentially — expect this to be noticeably slower
+  (seconds, not milliseconds) than the other endpoints. Design loading
+  states in the frontend accordingly.
 
 **Note on streaming:** this endpoint returns the complete answer in one
 response, not a token-by-token stream, despite "streaming" being listed as
@@ -266,19 +301,19 @@ support true response streaming; that needs a different invocation model).
 ---
 
 ### `GET /api/v1/chat/sessions`
+
 **Role:** any authenticated user
 
 Lists the caller's own sessions, most recent first.
 
 **Response `200`:**
+
 ```json
 {
   "success": true,
   "message": "Operation successful",
   "data": {
-    "sessions": [
-      { "sessionId": "sess-uuid", "createdAt": 1721990400 }
-    ]
+    "sessions": [{ "sessionId": "sess-uuid", "createdAt": 1721990400 }]
   }
 }
 ```
@@ -286,23 +321,44 @@ Lists the caller's own sessions, most recent first.
 ---
 
 ### `GET /api/v1/chat/sessions/{sessionId}/messages`
+
 **Role:** any authenticated user (must own the session — `403` otherwise)
 
 Returns all messages in a session, oldest first (chronological chat order).
 
 **Response `200`:**
+
 ```json
 {
   "success": true,
   "message": "Operation successful",
   "data": {
     "messages": [
-      { "messageId": "msg-1", "role": "user", "content": "When is the deadline to appeal an exam grade?", "sources": [], "createdAt": 1721990450 },
-      { "messageId": "msg-2", "role": "assistant", "content": "According to the Exam Regulations...", "sources": [{"documentId": "a1b2c3d4-...", "chunkId": "chunk-uuid", "pageNumber": 4}], "createdAt": 1721990460 }
+      {
+        "messageId": "msg-1",
+        "role": "user",
+        "content": "When is the deadline to appeal an exam grade?",
+        "sources": [],
+        "createdAt": 1721990450
+      },
+      {
+        "messageId": "msg-2",
+        "role": "assistant",
+        "content": "According to the Exam Regulations...",
+        "sources": [
+          {
+            "documentId": "a1b2c3d4-...",
+            "chunkId": "chunk-uuid",
+            "pageNumber": 4
+          }
+        ],
+        "createdAt": 1721990460
+      }
     ]
   }
 }
 ```
+
 Note: `role` is `"user"` or `"assistant"` — the frontend should render
 these as the two sides of the conversation. Every `POST /api/v1/chat` call
 writes both a user message and an assistant message, so this list grows
@@ -311,6 +367,7 @@ by 2 each turn.
 ---
 
 ### `GET /api/v1/messages/{messageId}`
+
 **Role:** any authenticated user (must own the parent session — `403` otherwise)
 
 Fetches a single message directly by id, without needing to already know
@@ -318,6 +375,7 @@ its session. Useful for deep-linking to a specific message (e.g. from a
 feedback confirmation).
 
 **Response `200`:**
+
 ```json
 {
   "success": true,
@@ -327,7 +385,9 @@ feedback confirmation).
     "sessionId": "sess-uuid",
     "role": "assistant",
     "content": "According to the Exam Regulations...",
-    "sources": [{ "documentId": "a1b2c3d4-...", "chunkId": "chunk-uuid", "pageNumber": 4 }],
+    "sources": [
+      { "documentId": "a1b2c3d4-...", "chunkId": "chunk-uuid", "pageNumber": 4 }
+    ],
     "createdAt": 1721990460
   }
 }
@@ -338,6 +398,7 @@ feedback confirmation).
 ## Feedback
 
 ### `POST /api/v1/messages/{messageId}/feedback`
+
 **Role:** any authenticated user
 
 Rates an assistant message. Typically called on `assistant`-role messages,
@@ -345,20 +406,31 @@ though the API doesn't currently block feedback on a `user`-role message —
 worth a frontend-side guard (only show the feedback UI on assistant bubbles).
 
 **Request body:**
+
 ```json
 {
   "rating": "up",
   "comment": "Exactly what I needed, thanks!"
 }
 ```
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `rating` | string | yes | `"up"` or `"down"` only |
-| `comment` | string | no | |
+
+| Field     | Type   | Required | Notes                   |
+| --------- | ------ | -------- | ----------------------- |
+| `rating`  | string | yes      | `"up"` or `"down"` only |
+| `comment` | string | no       |                         |
 
 **Response `201`:**
+
 ```json
-{ "success": true, "message": "Feedback submitted", "data": { "messageId": "msg-2", "rating": "up", "comment": "Exactly what I needed, thanks!" } }
+{
+  "success": true,
+  "message": "Feedback submitted",
+  "data": {
+    "messageId": "msg-2",
+    "rating": "up",
+    "comment": "Exactly what I needed, thanks!"
+  }
+}
 ```
 
 ---

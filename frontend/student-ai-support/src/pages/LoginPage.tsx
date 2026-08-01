@@ -111,11 +111,11 @@ export const LoginPage: React.FC = () => {
 
           {/* Top Header */}
           <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/10 backdrop-blur-xs rounded-xl flex items-center justify-center border border-white/20">
-              <span className="material-symbols-outlined text-[26px]">
-                school
-              </span>
-            </div>
+            <img
+              src="/assets/logo.png"
+              alt="Hypervisor Logo"
+              className="w-10 h-10 rounded-lg object-contain bg-white p-1 border border-white/20"
+            />
             <div>
               <h1 className="font-headline text-xl font-bold tracking-tight">
                 Hypervisor

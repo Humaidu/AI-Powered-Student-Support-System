@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { authApi } from "../api/authApi";
+import { ApplicationFormData } from "../types/website";
 
 type Step = "form" | "confirm";
 
 export const RegisterPage: React.FC = () => {
+  const location = useLocation();
   const [step, setStep] = useState<Step>("form");
 
   // Registration form fields
@@ -12,6 +14,7 @@ export const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [fromApplication, setFromApplication] = useState(false);
 
   // Confirmation step
   const [code, setCode] = useState("");
@@ -21,6 +24,28 @@ export const RegisterPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState("");
 
   const navigate = useNavigate();
+
+  // Check for pending application data on mount
+  useEffect(() => {
+    const pendingAppData = localStorage.getItem("pendingApplication");
+    if (pendingAppData) {
+      try {
+        const appData: ApplicationFormData = JSON.parse(pendingAppData);
+        setName(appData.fullName);
+        setEmail(appData.email);
+        setFromApplication(true);
+      } catch (err) {
+        console.warn("Failed to parse pending application data", err);
+      }
+    }
+    // Also check location state
+    if (location.state?.fromApplication && location.state?.applicationData) {
+      const appData = location.state.applicationData as ApplicationFormData;
+      setName(appData.fullName);
+      setEmail(appData.email);
+      setFromApplication(true);
+    }
+  }, [location.state]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +76,8 @@ export const RegisterPage: React.FC = () => {
         setStep("confirm");
       } else {
         // Mock mode: auto-confirmed, go straight to login
+        // Clear pending application data on successful registration
+        localStorage.removeItem("pendingApplication");
         navigate("/login");
       }
     } else {
@@ -73,6 +100,8 @@ export const RegisterPage: React.FC = () => {
     setIsSubmitting(false);
 
     if (res.success) {
+      // Clear pending application data on successful confirmation
+      localStorage.removeItem("pendingApplication");
       navigate("/login", { state: { confirmed: true } });
     } else {
       setErrorMsg(
@@ -90,11 +119,11 @@ export const RegisterPage: React.FC = () => {
           <div className="absolute -right-12 -bottom-12 w-80 h-80 rounded-full bg-[#0f4c81]/40 blur-2xl pointer-events-none"></div>
 
           <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/10 backdrop-blur-xs rounded-xl flex items-center justify-center border border-white/20">
-              <span className="material-symbols-outlined text-[26px]">
-                school
-              </span>
-            </div>
+            <img
+              src="/assets/logo.png"
+              alt="Hypervisor Logo"
+              className="w-10 h-10 rounded-lg object-contain bg-white p-1 border border-white/20"
+            />
             <div>
               <h1 className="font-headline text-xl font-bold tracking-tight">
                 Hypervisor
@@ -168,6 +197,18 @@ export const RegisterPage: React.FC = () => {
                     Register with your university email address.
                   </p>
                 </div>
+
+                {fromApplication && (
+                  <div className="mb-4 p-3 bg-[#c2e7ff] border border-[#0f4c81]/30 text-[#00355f] rounded-xl text-xs font-medium flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[18px]">
+                      info
+                    </span>
+                    <span>
+                      <strong>Application in progress:</strong> Complete your
+                      registration to finalize your programme application.
+                    </span>
+                  </div>
+                )}
 
                 {errorMsg && (
                   <div className="mb-4 p-3 bg-[#ffdad6] border border-[#ba1a1a]/30 text-[#ba1a1a] rounded-xl text-xs font-medium flex items-center gap-2">

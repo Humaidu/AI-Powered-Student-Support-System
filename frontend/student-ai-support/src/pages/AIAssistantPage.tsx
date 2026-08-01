@@ -19,7 +19,6 @@ export const AIAssistantPage: React.FC = () => {
   const [chatSearch, setChatSearch] = useState("");
   const [inputMessage, setInputMessage] = useState("");
   const [fileAttachment, setFileAttachment] = useState<File | null>(null);
-  const [openRagMap, setOpenRagMap] = useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [feedbackGiven, setFeedbackGiven] = useState<
     Record<string, "helpful" | "unhelpful">
@@ -86,10 +85,6 @@ export const AIAssistantPage: React.FC = () => {
   ) => {
     setFeedbackGiven((prev) => ({ ...prev, [messageId]: type }));
     await feedbackApi.submitFeedback(messageId, type);
-  };
-
-  const toggleRagBox = (msgId: string) => {
-    setOpenRagMap((prev) => ({ ...prev, [msgId]: !prev[msgId] }));
   };
 
   const toSafeString = (value: unknown): string =>
@@ -352,69 +347,6 @@ export const AIAssistantPage: React.FC = () => {
                             <div className="whitespace-pre-wrap leading-relaxed space-y-2">
                               {msg.content}
                             </div>
-
-                            {/* RAG Verification Sources Dropdown Collapsible */}
-                            {msg.ragVerification &&
-                              msg.ragVerification.sources.length > 0 && (
-                                <div className="border border-[#c2c7d1] bg-[#eff4ff]/60 rounded-xl overflow-hidden mt-3">
-                                  <button
-                                    onClick={() => toggleRagBox(msg.id)}
-                                    className="w-full px-4 py-2.5 flex items-center justify-between text-xs font-bold text-[#00355f] hover:bg-[#dce9ff]/50 transition-colors cursor-pointer select-none"
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <span className="material-symbols-outlined text-[#0f4c81] text-[18px]">
-                                        verified
-                                      </span>
-                                      <span>
-                                        RAG Verification (
-                                        {msg.ragVerification.sourceCount}{" "}
-                                        Institutional Documents Referenced)
-                                      </span>
-                                    </div>
-                                    <span className="material-symbols-outlined text-[18px]">
-                                      {openRagMap[msg.id] !== false
-                                        ? "expand_less"
-                                        : "expand_more"}
-                                    </span>
-                                  </button>
-
-                                  {openRagMap[msg.id] !== false && (
-                                    <div className="px-4 pb-3 pt-1 space-y-2 border-t border-[#c2c7d1]/50 bg-white/80">
-                                      {msg.ragVerification.sources.map(
-                                        (src, idx) => (
-                                          <div
-                                            key={idx}
-                                            className="p-2.5 bg-[#f8f9ff] border border-[#c2c7d1] rounded-lg text-xs space-y-1"
-                                          >
-                                            <div className="flex items-center justify-between font-bold text-[#0f4c81]">
-                                              <div className="flex items-center gap-1.5">
-                                                <span className="material-symbols-outlined text-[16px]">
-                                                  description
-                                                </span>
-                                                <span>{src.document}</span>
-                                              </div>
-                                              <span className="bg-[#bbd3fd] text-[#445a7f] text-[10px] font-extrabold px-2 py-0.5 rounded-full">
-                                                {Math.round(
-                                                  src.confidence * 100,
-                                                )}
-                                                % Match
-                                              </span>
-                                            </div>
-                                            <p className="text-[11px] text-[#42474f]">
-                                              {src.section} | Page {src.page}
-                                            </p>
-                                            {src.snippet && (
-                                              <p className="text-[11px] text-[#727780] italic bg-white p-1.5 rounded border border-[#c2c7d1]/40">
-                                                "{src.snippet}"
-                                              </p>
-                                            )}
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
 
                             {/* Action Buttons: Copy, Regenerate, Thumbs up/down */}
                             <div className="flex items-center justify-between pt-2 border-t border-[#c2c7d1]/60 text-xs text-[#42474f]">
