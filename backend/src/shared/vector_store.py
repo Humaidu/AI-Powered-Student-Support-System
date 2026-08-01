@@ -10,7 +10,6 @@ from opensearchpy import OpenSearch, RequestsHttpConnection, AWSV4SignerAuth
 
 _INDEX_NAME = "document-chunks"
 
-
 def _client() -> OpenSearch:
     endpoint = os.environ["OPENSEARCH_ENDPOINT"].replace("https://", "")
     region = os.environ.get("AWS_REGION", "eu-west-1")

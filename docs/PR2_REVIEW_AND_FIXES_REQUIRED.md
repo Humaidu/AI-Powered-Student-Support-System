@@ -29,6 +29,7 @@ question = (body.get("message") or "").strip()
 `lambdaChatService.ts` sends `{ sessionId, content }`. The handler reads `"message"`, which is always `None`, so every request returns `"message is required"`. No chat message will ever succeed.
 
 **Fix:**
+
 ```python
 question = (body.get("content") or "").strip()
 ```
@@ -141,6 +142,7 @@ The same function should also be called from the `reject` flow (if one is added)
 `arn:aw:` is not a valid ARN partition. The IAM policy will either be rejected at apply time or silently fail to grant the permission. Every ingestion run will return `AccessDenied` when calling Titan Embeddings.
 
 **Fix:**
+
 ```hcl
 "arn:aws:bedrock:${var.aws_region}::foundation-model/${var.bedrock_embedding_model_id}",
 ```
@@ -153,12 +155,12 @@ The same function should also be called from the `reject` flow (if one is added)
 
 `cognitoAuthProvider.ts` calls these four endpoints:
 
-| Method | Path |
-|--------|------|
-| `POST` | `/api/v1/auth/cognito/login` |
+| Method | Path                          |
+| ------ | ----------------------------- |
+| `POST` | `/api/v1/auth/cognito/login`  |
 | `POST` | `/api/v1/auth/cognito/logout` |
-| `GET`  | `/api/v1/auth/me` |
-| `POST` | `/api/v1/auth/switch-role` |
+| `GET`  | `/api/v1/auth/me`             |
+| `POST` | `/api/v1/auth/switch-role`    |
 
 None of these routes exist in the API Gateway route table and no handler files exist for them. With `VITE_APP_MODE=aws` the login page will fail immediately.
 
@@ -188,9 +190,9 @@ auth_switch_role = { key = "POST /api/v1/auth/switch-role",    fn = "auth_switch
 
 `lambdaChatService.ts` calls:
 
-| Method | Path |
-|--------|------|
-| `DELETE` | `/api/v1/chat/sessions/{sessionId}` |
+| Method   | Path                                    |
+| -------- | --------------------------------------- |
+| `DELETE` | `/api/v1/chat/sessions/{sessionId}`     |
 | `POST`   | `/api/v1/chat/sessions/{sessionId}/pin` |
 
 Neither route nor handler exists. The Conversations page will error when a user tries to delete or pin a session.

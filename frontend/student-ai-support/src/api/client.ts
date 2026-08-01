@@ -7,17 +7,29 @@ export async function apiClient<T>(
 ): Promise<ApiResponse<T>> {
   const url = `${config.API_BASE_URL}${endpoint}`;
   
-  // Attach JWT token from auth storage
+  // Attach JWT token from auth storage.
   const storedUser = localStorage.getItem('hypervisor_current_user');
-  let token = 'mock.jwt.token';
+  let token: string | null = null;
   if (storedUser) {
     try { token = JSON.parse(storedUser).token; } catch { /* ignore */ }
   }
 
+  if (config.APP_MODE === 'aws' && !token) {
+    return {
+      success: false,
+      error: {
+        code: 'AUTH_REQUIRED',
+        message: 'Authentication required. Please sign in again.',
+      },
+    };
+  }
+
   const defaultHeaders: Record<string, string> = {
-    'Authorization': `Bearer ${token}`,
     ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
   };
+  if (token) {
+    defaultHeaders.Authorization = `Bearer ${token}`;
+  }
 
   try {
     const response = await fetch(url, {
@@ -28,8 +40,36 @@ export async function apiClient<T>(
       },
     });
 
-    const data: ApiResponse<T> = await response.json();
-    return data;
+    const raw = await response.text();
+    let parsed: any = {};
+    try {
+      parsed = raw ? JSON.parse(raw) : {};
+    } catch {
+      parsed = { message: raw || response.statusText };
+    }
+
+    if (!response.ok) {
+      const message =
+        parsed?.error?.message ||
+        parsed?.message ||
+        `${response.status} ${response.statusText}`;
+      return {
+        success: false,
+        error: {
+          code: parsed?.error?.code || `HTTP_${response.status}`,
+          message,
+        },
+      };
+    }
+
+    if (typeof parsed?.success === 'boolean') {
+      return parsed as ApiResponse<T>;
+    }
+
+    return {
+      success: true,
+      data: parsed as T,
+    };
   } catch (err: any) {
     return {
       success: false,
