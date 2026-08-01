@@ -23,7 +23,7 @@ SYSTEM_PROMPT = (
     "knowledge, and never invent information not present in the excerpts. "
     "If the excerpts don't contain enough information to answer confidently, "
     f'respond with exactly: "{NO_ANSWER_MESSAGE}" '
-    "When you do answer, be concise and cite which excerpt(s) you used."
+    "When you do answer, be concise and cite which excerpt(s) you used. Finish complete thoughts, cover the excerpts thoroughly, and avoid unnecessary padding."
 )
 
 
@@ -86,7 +86,7 @@ def _bedrock_generate(question: str, context_chunks: list[dict]) -> str:
     context_text = _build_context_text(context_chunks)
     body = {
         "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 600,
+        "max_tokens": 2048,
         "system": SYSTEM_PROMPT,
         "messages": [
             {"role": "user", "content": f"Document excerpts:\n\n{context_text}\n\nStudent question: {question}"}
@@ -175,7 +175,7 @@ def _gemini_generate(question: str, context_chunks: list[dict]) -> str:
         "contents": [
             {"role": "user", "parts": [{"text": f"Document excerpts:\n\n{context_text}\n\nStudent question: {question}"}]}
         ],
-        "generationConfig": {"maxOutputTokens": 600},
+        "generationConfig": {"maxOutputTokens": 2048},
     }
     payload = _gemini_request(url, body)
     try:
