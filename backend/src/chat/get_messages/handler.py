@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -6,6 +7,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../../shared"))
 from auth import get_user_id, AuthError
 from db import get_session_owner, list_messages
 from responses import ok, unauthorized, forbidden, not_found, server_error
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def lambda_handler(event, context):
@@ -26,7 +30,8 @@ def lambda_handler(event, context):
 
     try:
         messages = list_messages(session_id)
-    except Exception:
+    except Exception as exc:
+        logger.error("Failed to fetch messages for session %s: %s", session_id, exc)
         return server_error("Failed to fetch messages")
 
     return ok({
