@@ -1,13 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { LoginPage } from './pages/LoginPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { AIAssistantPage } from './pages/AIAssistantPage';
-import { ConversationsPage } from './pages/ConversationsPage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { HelpPage } from './pages/HelpPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { StudentRoute, AdminRoute } from './routes/Guards';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { AIAssistantPage } from "./pages/AIAssistantPage";
+import { ConversationsPage } from "./pages/ConversationsPage";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage";
+import { HelpPage } from "./pages/HelpPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { PublicWebsiteLayout } from "./pages/public/PublicWebsiteLayout";
+import { StudentRoute, AdminRoute } from "./routes/Guards";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,8 +25,12 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          {/* Public Auth Route */}
+          {/* Public Website Homepage */}
+          <Route path="/" element={<PublicWebsiteLayout />} />
+
+          {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
 
           {/* Protected Routes */}
           <Route element={<StudentRoute />}>
@@ -41,7 +47,7 @@ export default function App() {
           </Route>
 
           {/* Default Redirect */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
