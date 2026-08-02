@@ -1,549 +1,463 @@
-# AI-Powered Student Support Platform
+# AI-Powered Student Support Platform Architecture
 
 ## Version
 
-- 1.0
-- Status: MVP Architecture Locked
+- Version: 2.1
+- Status: Updated for current implementation and deployment model
 
-## 1. Overview
+## 1. Purpose
 
-The AI-Powered Student Support Platform is a serverless AI assistant designed to help students access accurate institutional information through natural-language conversations.
+The AI-Powered Student Support Platform is a digital student support system designed to give students and administrators fast, reliable access to institutional knowledge through a conversational AI assistant.
 
-The platform uses Retrieval-Augmented Generation (RAG) so responses are grounded in approved institutional documents rather than general model knowledge. The system supports:
+The platform is built to do three important things:
 
-- Student questions about academic and administrative matters
-- Retrieval of relevant institutional knowledge
-- Document upload and lifecycle management by administrators
-- AI-assisted document processing and metadata enrichment
-- Secure document governance
-- Conversation history tracking
-- Feedback collection for continuous AI improvement
+1. Help students ask questions in everyday language.
+2. Provide answers that are grounded in approved institutional documents.
+3. Allow administrators to upload, review, and manage the documents that power the AI.
 
-## 2. Goals and MVP Scope
+The system combines a modern web interface, serverless cloud services, a document ingestion pipeline, and a search system that can understand meaning, not just keywords.
 
-### Included Features
+## 2. Who the System Serves
 
-#### Student Features
+### Students
 
-- Authentication
-- AI chat assistant
-- Conversation sessions
-- Conversation history
-- Source references
-- Response feedback
+Students can:
 
-#### Administrator Features
+- sign in securely
+- ask academic or administrative questions
+- continue conversations across sessions
+- receive answers with document-backed references
+- give feedback on response quality
 
-- Upload documents
-- Manage document metadata
-- Review AI-generated metadata
-- Approve documents
-- Delete documents
-- Track processing status
+### Administrators
 
-#### AI Features
+Administrators can:
 
-- Document ingestion pipeline
-- Metadata extraction
-- Semantic chunking
-- Embedding generation
-- Vector search
-- Context-based answer generation
-- Hallucination prevention
+- upload institutional documents
+- review document status and metadata
+- approve or reject content for use in the AI
+- manage the knowledge base behind the assistant
 
-### Out of Scope for MVP
+## 3. Core Design Principles
 
-- Admin dashboard UI
-- OCR processing
-- Lecturer portal
-- Staff portal
-- Student financial information integration
-- Real-time university ERP integration
-- Automated document publishing
+The system is designed around four principles:
 
-## 3. Technology Stack
-
-### Cloud Platform
-
-- Amazon Web Services (AWS)
-
-### Backend Components
-
-- API: Amazon API Gateway
-- Compute: AWS Lambda
-- Authentication: Amazon Cognito
-- Database: Amazon DynamoDB
-- File Storage: Amazon S3
-- Vector Search: Amazon OpenSearch Serverless
-- AI Platform: Amazon Bedrock
-- Embeddings: Amazon Titan Text Embeddings V2
-- Monitoring: Amazon CloudWatch
-- Secrets: AWS Secrets Manager
+- Accuracy: answers should come from institutional documents, not from generic model knowledge.
+- Security: user access and content governance must be controlled.
+- Scalability: the platform should continue to work as more users and documents are added.
+- Simplicity: the user experience should feel easy even though the system is technically complex.
 
 ## 4. High-Level Architecture
 
-The platform follows a serverless event-driven architecture where client applications communicate through API Gateway and Lambda functions manage business logic.
+The platform is built as a serverless, event-driven system on AWS.
+
+At a high level, the architecture has five layers:
+
+1. Frontend layer
+2. API and authentication layer
+3. Business logic layer
+4. Data and document layer
+5. AI and search layer
 
 ```text
-Client Applications
+Frontend Applications
     │
     ▼
-Amazon API Gateway
+API Gateway
     │
-    ├───────────────┬───────────────┬───────────────┬───────────────┐
-    │               │               │               │               │
-    ▼               ▼               ▼               ▼
-Auth Lambda    Chat Lambda    Document Lambda   Admin Lambda
-
-    │
-    ▼
-DynamoDB
-
-    ───────────────┬──────────────
-    │              │
-    ▼              ▼
-S3         OpenSearch Vector DB
-
-    │
-    ▼
-Amazon Bedrock
+    ├── Auth Services
+    ├── Chat Services
+    ├── Document Services
+    └── Admin Services
+            │
+            ▼
+        AWS Lambda Functions
+            │
+            ├── Cognito / JWT validation
+            ├── Chat processing
+            ├── Document management
+            ├── Ingestion processing
+            └── Feedback handling
+            │
+            ├── DynamoDB
+            ├── S3
+            └── OpenSearch
+                    │
+                    ▼
+                Gemini
 ```
 
-## 5. Backend Service Architecture
+## 5. Main Components
 
-The backend is organized around domain-based Lambda services. Each Lambda function owns a specific business capability.
+### 5.1 Frontend Applications
 
-### 5.1 Auth Lambda
+The user-facing frontend is a React and TypeScript web application.
 
-Responsibilities:
+It provides:
 
-- Authentication validation
-- User identity extraction
-- Role authorization
+- a student-facing experience for login, chat, and viewing information
+- an administrative experience for document upload and review
+- a public-facing website experience for admissions and institutional information
 
-Authentication is handled by Amazon Cognito.
+The frontend sends requests to the backend through API Gateway and receives data in a structured response format.
 
-### 5.2 Chat Lambda
+### 5.9 Frontend Hosting and Deployment (Current)
 
-Responsibilities:
+The frontend is hosted on AWS Amplify and managed with a hybrid approach:
 
-- Creating chat sessions
-- Receiving student questions
-- Retrieving conversation context
-- Performing RAG search
-- Calling Bedrock
-- Streaming responses
-- Saving messages
+- infrastructure provisioning is managed in Terraform (Amplify app, branch, domain association, and rewrite rules)
+- frontend releases are deployed as build artifacts through Amplify deployment APIs
+- a one-command deployment script builds, packages, uploads, and starts deployment jobs
 
-### 5.3 Document Lambda
+This approach allows fast deployments without requiring repository-connected builds while still keeping infrastructure as code.
 
-Responsibilities:
+### 5.2 API Gateway
 
-- Upload initiation
-- Document metadata management
-- Document listing
-- Document deletion
-- Version management
+API Gateway is the main entry point for all client requests.
 
-### 5.4 Admin Lambda
+It handles:
 
-Responsibilities:
+- routing requests to the right Lambda function
+- request validation
+- authentication integration
+- API access control
 
-- Metadata approval
-- Document activation
-- Document rejection
-- Administrative actions
+### 5.3 Amazon Cognito
 
-### 5.5 Feedback Lambda
+Cognito manages identity and access.
 
-Responsibilities:
+It provides:
 
-- Student ratings
-- Feedback comments
-- AI quality tracking
+- user sign-in and sign-out
+- user registration
+- role-based access control for students and administrators
+- secure token issuance for API requests
 
-### 5.6 Ingestion Worker Lambda
+### 5.4 AWS Lambda
 
-Responsibilities:
+The core business logic runs in Lambda functions. These functions are responsible for specific responsibilities such as:
 
-- Processing uploaded documents
-- Extracting text
-- Generating metadata
-- Chunking documents
-- Creating embeddings
-- Updating processing state
+- authentication and authorization
+- chat session creation and message handling
+- document upload and listing
+- document approval and lifecycle actions
+- ingestion processing and document transformation
+- feedback collection and tracking
 
-## 6. Authentication and Authorization
+### 5.5 Amazon S3
 
-### Authentication Provider
+S3 is the primary document storage layer.
 
-- Amazon Cognito
+It stores:
 
-### Supported Roles
+- original uploaded files
+- versioned document content
+- assets used by the public website and application UI
 
-#### MVP Roles
+### 5.6 Amazon DynamoDB
 
-- STUDENT
-- ADMIN
+DynamoDB stores structured application data such as:
 
-#### Future Roles
+- user profiles
+- chat sessions
+- chat messages
+- document metadata
+- processing status
+- feedback records
 
-- LECTURER
-- STAFF
-- SUPER_ADMIN
+### 5.7 OpenSearch
 
-### Authentication Flow
+OpenSearch is the vector search engine used for the AI retrieval system.
+
+It stores:
+
+- document chunks
+- embeddings
+- metadata such as document source and version
+
+This is the layer that lets the assistant find the most relevant information even when the user asks a question in a different way.
+
+### 5.8 Google Gemini
+
+Gemini provides the large language model capabilities used to generate responses.
+
+The system uses Gemini in combination with retrieved document context so the final answer is more accurate and more grounded in approved institutional content.
+
+## 6. System Roles and Responsibilities
+
+| Layer             | Main Responsibility             | Key Services            |
+| ----------------- | ------------------------------- | ----------------------- |
+| Frontend          | User interaction and UI         | React, TypeScript, Vite |
+| API Layer         | Secure request routing          | API Gateway             |
+| Identity          | Authentication and access       | Cognito                 |
+| Application Logic | Business rules and workflows    | Lambda                  |
+| Storage           | Documents and operational data  | S3, DynamoDB            |
+| Search and AI     | Retrieval and answer generation | OpenSearch, Gemini      |
+
+## 7. End-to-End Student Chat Flow
+
+This is the main flow for a student asking a question.
+
+### Step 1: User enters a question
+
+A student opens the chat interface and sends a question such as:
+
+- “What are the entry requirements for the cloud computing programme?”
+- “When does the admissions process open?”
+
+### Step 2: Authentication and request validation
+
+The frontend sends the request to API Gateway. If needed, the user is validated using Cognito-issued credentials.
+
+### Step 3: Chat service receives the request
+
+A chat Lambda function receives the request and prepares the conversation context.
+
+It may:
+
+- load the active chat session
+- retrieve recent messages from DynamoDB
+- identify the user and their role
+
+### Step 4: The question is converted into a search query
+
+The system creates an embedding for the student’s question.
+
+This embedding is a numerical representation of the meaning of the question so the system can search semantically rather than relying only on exact word matching.
+
+### Step 5: Relevant content is retrieved
+
+The embedding is sent to OpenSearch, which compares it against stored embeddings from approved document chunks.
+
+OpenSearch returns the most relevant passages or chunks.
+
+### Step 6: The AI generates a grounded answer
+
+The retrieved document chunks are passed to the language model through Gemini along with the user’s question.
+
+The model is instructed to answer using only the retrieved context and to avoid unsupported claims.
+
+### Step 7: The response is returned to the user
+
+The answer is sent back through the API layer to the frontend and shown to the student.
+
+The response may include:
+
+- the answer itself
+- source references to the relevant document chunks
+- optional follow-up suggestions
+
+### Step 8: Conversation state is saved
+
+The message, session context, and feedback information are stored in DynamoDB so future interactions remain consistent.
+
+### Student Flow Summary
 
 ```text
-User Login
+Student asks question
     ▼
-Amazon Cognito
+Frontend sends request
     ▼
-JWT Token
+API Gateway routes request
     ▼
-API Gateway Authorizer
+Lambda loads chat context
     ▼
-Lambda
+Question embedding created
+    ▼
+OpenSearch finds relevant chunks
+    ▼
+Gemini generates grounded response
+    ▼
+Frontend displays answer
+    ▼
+Conversation data saved in DynamoDB
 ```
 
-## 7. API Design
+## 8. End-to-End Admin Document Flow
 
-### Base URL
+This is the flow for administrators uploading and preparing documents for the AI.
 
-All APIs use:
+### Step 1: Admin uploads a document
 
-- /api/v1
+An administrator uses the document management interface to upload a file such as a PDF or document.
 
-### Response Format
+### Step 2: The file is stored in S3
 
-#### Success
+The file is received by the backend and stored in S3.
 
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": {}
-}
-```
+This preserves the original document in a secure and scalable storage layer.
 
-#### Error
+### Step 3: Metadata is recorded
 
-```json
-{
-  "success": false,
-  "error": {
-    "code": "DOCUMENT_NOT_FOUND",
-    "message": "Document does not exist"
-  }
-}
-```
+The system records important metadata such as:
 
-## 8. API Endpoints
+- document title
+- upload date
+- uploader identity
+- document type
+- approval status
+- processing state
 
-### Authentication
+This information is stored in DynamoDB.
 
-Authentication is handled by Cognito.
+### Step 4: The ingestion worker processes the file
 
-### Documents
+A background ingestion process reads the file from S3 and performs the following actions:
 
-- Upload document: POST /api/v1/documents
-- List documents: GET /api/v1/documents
-- Get document: GET /api/v1/documents/{documentId}
-- Delete document: DELETE /api/v1/documents/{documentId}
-- Approve document: POST /api/v1/documents/{documentId}/approve
+- validates the file
+- extracts text from the content
+- creates document metadata
+- splits the document into manageable chunks
+- generates embeddings for each chunk
+- stores the chunks and embeddings in OpenSearch
 
-### Chat
+### Step 5: The document is reviewed
 
-- Create session: POST /api/v1/chat/sessions
-- Send message: POST /api/v1/chat
-- Get sessions: GET /api/v1/chat/sessions
-- Get messages: GET /api/v1/chat/sessions/{sessionId}/messages
+The administrator can review the document before it becomes active for AI use.
 
-### Feedback
+Approval states may include:
 
-- Submit feedback: POST /api/v1/messages/{messageId}/feedback
+- pending review
+- approved
+- rejected
 
-## 9. Document Ingestion Pipeline
+### Step 6: The document becomes part of the AI knowledge base
 
-The ingestion pipeline transforms uploaded files into searchable knowledge for RAG.
+Once approved, the document can be retrieved during student questions and used to generate grounded answers.
+
+### Admin Flow Summary
 
 ```text
-Admin Upload
+Admin uploads document
     ▼
-S3 Storage
+File stored in S3
     ▼
-S3 Event Trigger
+Metadata saved in DynamoDB
     ▼
-Document Processor Lambda
-    ├─ Validate File
-    ├─ SHA256 Checksum
-    ├─ Extract Text
-    ├─ AI Metadata Extraction
-    ├─ Save Metadata
-    ├─ Semantic Chunking
-    ├─ Generate Embeddings
-    └─ Store Vectors
+Ingestion worker extracts text
     ▼
-Admin Review
+Document is chunked and embedded
     ▼
-APPROVED
+Embeddings stored in OpenSearch
     ▼
-Available for RAG Search
+Admin reviews and approves document
+    ▼
+Document becomes available to the AI
 ```
 
-## 10. Supported Documents
+## 9. How Document Embedding Works
 
-### Supported Formats
+Document embedding is the process of turning document content into vector representations that capture meaning.
 
-- PDF
-- DOCX
-- TXT
+### Why it is needed
 
-### Upload Limits
+Traditional keyword search can miss relevant material if the wording is different. Embeddings allow the system to find content that is conceptually similar, even when the exact words differ.
 
-- Maximum size: 25 MB
-- Maximum pages: 500
+### Process
 
-### Rejected Files
+1. A document is uploaded and stored.
+2. The ingestion pipeline extracts the text.
+3. The text is divided into smaller chunks.
+4. Each chunk is converted into an embedding using an embedding model.
+5. The embedding is stored in OpenSearch together with the chunk content and metadata.
 
-- Password-protected PDFs
-- Unsupported formats
-- Files without extractable text
+### Example
 
-OCR processing is not included in the MVP.
+If a student asks, “What are the requirements to join the programme?” and the document says “Admission criteria,” the embedding-based search can still find the relevant section because the meaning is similar.
 
-## 11. Document Metadata Schema
+## 10. Why OpenSearch Is Important
 
-```json
-{
-  "documentId": "",
-  "title": "",
-  "description": "",
-  "documentType": "",
-  "department": "",
-  "academicYear": "",
-  "version": 1,
-  "tags": [],
-  "uploadedBy": "",
-  "uploadedAt": "",
-  "status": "ACTIVE",
-  "checksum": "",
-  "s3Key": "",
-  "fileSize": "",
-  "mimeType": "",
-  "processingStatus": "",
-  "approvalStatus": ""
-}
-```
+OpenSearch is the retrieval engine for the AI assistant.
 
-### Processing Status Values
+It helps the system:
 
-- UPLOADED
-- PROCESSING
-- EMBEDDING
-- COMPLETED
-- FAILED
+- search through many document chunks quickly
+- rank the most relevant content
+- return context that is useful for answer generation
+- support semantic rather than literal matching
 
-### Approval Status Values
+In short, OpenSearch makes the AI more useful because it can locate the right information from a large pool of documents.
 
-- PENDING_REVIEW
-- APPROVED
-- REJECTED
+## 11. Data Storage Design
 
-## 12. RAG Query Pipeline
-
-```text
-Student Question
-    ▼
-Chat Lambda
-    ▼
-Generate Query Embedding
-    ▼
-OpenSearch Vector Search
-    ▼
-Retrieve Top 5 Chunks
-    ▼
-Bedrock Generation Model
-    ▼
-Stream Response
-```
-
-## 13. AI Rules
-
-The assistant must:
-
-- Answer only from institutional documents
-- Refuse unsupported questions
-- Include source references
-- Never invent information
-
-If confidence is low, the system should respond with:
-
-> I could not find this information in the available institutional documents. Please contact the appropriate department.
-
-## 14. Vector Database Design
-
-OpenSearch stores:
-
-- Document chunks
-- Embeddings
-- Search metadata
-
-Example record:
-
-```json
-{
-  "chunkId": "",
-  "documentId": "",
-  "content": "",
-  "embedding": [],
-  "metadata": {
-    "pageNumber": 14,
-    "documentVersion": 2
-  }
-}
-```
-
-## 15. DynamoDB Design
-
-The system uses a single-table design for application state.
-
-Example access patterns:
-
-```text
-PK                  SK
-USER#123            PROFILE
-USER#123            SESSION#001
-SESSION#001         MESSAGE#001
-DOCUMENT#001       METADATA
-DOCUMENT#001       VERSION#002
-MESSAGE#001        FEEDBACK
-```
-
-## 16. Storage Architecture
-
-### Amazon S3
-
-Stores documents in the following structure:
-
-```text
-documents/
-  institution/
-    documentId/
-      version/
-        original-file.pdf
-```
+The platform uses different storage layers for different purposes.
 
 ### DynamoDB
 
-Stores application state and operational metadata.
+Used for operational and application data such as:
+
+- chat sessions
+- messages
+- user state
+- document status
+- feedback
+
+### S3
+
+Used for durable document storage such as:
+
+- original uploaded files
+- document archives
+- frontend assets
 
 ### OpenSearch
 
-Stores vector embeddings and retrieval metadata only.
+Used for retrieval data such as:
 
-## 17. Security Architecture
+- chunk content
+- vector embeddings
+- search metadata
 
-### Encryption
+## 12. Security and Governance
 
-- S3 SSE-KMS enabled
-- DynamoDB encryption enabled
-- OpenSearch encryption enabled
+Security is a central part of the design.
 
-### Secrets Management
+### Authentication and access control
 
-Secrets are stored in AWS Secrets Manager for:
+- user access is managed through Cognito
+- permissions are role-based
+- student and administrator actions are separated
 
-- API secrets
-- External integrations
-- Configuration secrets
+### Document governance
 
-### File Upload Security
+- documents must be reviewed before they become active for AI use
+- admin actions are tracked for accountability
+- the system is designed to prevent unsupported or unauthorized content from being used in responses
 
-Documents are uploaded using pre-signed S3 URLs.
+### Data protection
 
-Flow:
+- cloud resources are protected through standard AWS security practices
+- secrets and configuration values are managed separately from application code
 
-```text
-Frontend
-    ▼
-API Request Upload URL
-    ▼
-Lambda
-    ▼
-Signed S3 URL
-    ▼
-Direct Upload
-```
+## 13. Operational Flow in Simple Terms
 
-Benefits:
+A simple way to describe the system is:
 
-- Lower cost
-- Better scalability
-- Reduced Lambda memory usage
+- Students ask questions.
+- The system finds the most relevant approved documents.
+- The system uses those documents to generate an answer.
+- Administrators keep the document library accurate and approved.
 
-## 18. Audit Logging
+That means the AI is not acting from memory alone. It is acting from a controlled set of institutional knowledge.
 
-Administrative actions are tracked for governance and traceability, including events such as:
+## 14. Repository Structure Reference
 
-- DOCUMENT_UPLOADED
-- DOCUMENT_APPROVED
-- DOCUMENT_DELETED
-- USER_LOGIN
-- AI_RESPONSE_GENERATED
+The implementation is organized around a few clear areas:
 
-Audit logs are stored in DynamoDB.
+- frontend: user-facing web application
+- backend/src/chat: chat sessions and message handling
+- backend/src/documents: document upload, listing, approval, and deletion
+- backend/src/ingestion: document processing and embedding workflows
+- backend/src/shared: shared utilities and common logic
+- terraform: infrastructure and cloud resource definitions
 
-## 19. Environment Variables
+## 15. Summary
 
-Example configuration:
+The platform combines a user-friendly frontend, secure authentication, serverless application logic, document storage, semantic search, and language model generation into one integrated system.
 
-```text
-AWS_REGION=
-COGNITO_USER_POOL_ID=
-COGNITO_CLIENT_ID=
-DOCUMENT_BUCKET=
-DYNAMODB_TABLE=
-OPENSEARCH_ENDPOINT=
-BEDROCK_MODEL_ID=
-BEDROCK_EMBEDDING_MODEL_ID=
-```
+In practical terms:
 
-## 20. Local Development
-
-### Requirements
-
-- Node.js 22+
-- AWS CLI
-- AWS SAM CLI
-- Docker
-- Git
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Run Locally
-
-```bash
-sam local start-api
-```
-
-## 21. Deployment
-
-The platform is designed for deployment to AWS using infrastructure-as-code and serverless deployment practices. Future deployment work should align with the same architecture and environment model described above.
-
-## 22. Future Enhancements
-
-Possible future roadmap items include:
-
-- OCR support
-- Admin dashboard
-- Lecturer assistant
-- Multi-tenant SaaS
-- Analytics dashboard
-- Voice assistant
-- ERP integration
-- Personalized student guidance
+- students get faster and more reliable answers
+- administrators control the knowledge base
+- the AI remains grounded in approved institutional documents
+- the system can grow as more courses, policies, and documents are added
