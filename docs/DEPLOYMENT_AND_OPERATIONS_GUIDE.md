@@ -28,6 +28,16 @@ Before deploying, confirm that:
 
 ## 3. Terraform Deployment
 
+### 3.0 Recommended deployment workflow
+
+For safe changes, follow this sequence:
+
+1. Create or update a branch for the change.
+2. Review the Terraform plan before applying it.
+3. Apply changes in a non-production environment first when possible.
+4. Verify the application health and key user flows after deployment.
+5. Record the deployment outcome for future troubleshooting.
+
 ### 3.1 Initialize Terraform
 
 ```bash
@@ -47,7 +57,17 @@ terraform plan -var="environment=dev"
 terraform apply -var="environment=dev"
 ```
 
-### 3.4 Destroy resources when needed
+### 3.4 Verify the deployment
+
+After apply completes, confirm:
+
+```bash
+terraform output
+```
+
+Then verify that the relevant services are reachable and that key flows still work, including authentication, chat, and document upload.
+
+### 3.5 Destroy resources when needed
 
 ```bash
 terraform destroy -var="environment=dev"
@@ -111,6 +131,8 @@ At the moment, the repository does not include a visible GitHub Actions workflow
 
 ## 7. Rollback Strategy
 
+Rollback should be treated as a standard operational procedure, not a last resort.
+
 If a deployment introduces issues:
 
 1. Review the Terraform plan and recent changes
@@ -126,6 +148,16 @@ If a deployment introduces issues:
 - Check whether the application is still reading the correct environment variables
 
 ## 8. Monitoring and Operations
+
+### Operational ownership
+
+A deployment owner should be responsible for:
+
+- confirming the deployment completed successfully
+- checking logs and system health after changes
+- escalating issues when the application becomes unavailable or behaves unexpectedly
+
+### Monitoring checklist
 
 ### Logging
 
@@ -147,7 +179,17 @@ The frontend server includes a health endpoint at:
 
 This can be used as a quick operational sanity check during deployment.
 
-## 9. Common Operational Issues
+## 9. Incident Response
+
+If the platform fails after deployment, follow this sequence:
+
+1. Confirm the incident scope and affected services.
+2. Check CloudWatch logs for Lambda and API Gateway errors.
+3. Review recent Terraform changes and deployment history.
+4. Roll back to the last known-good state if needed.
+5. Communicate the issue, mitigation steps, and recovery status to stakeholders.
+
+## 10. Common Operational Issues
 
 ### Terraform apply fails
 
@@ -185,7 +227,7 @@ Verify:
 - Token issuer and audience settings
 - Frontend environment variables
 
-## 10. Recommended Operational Checklist
+## 11. Recommended Operational Checklist
 
 Before releasing a new deployment, verify:
 
@@ -195,7 +237,7 @@ Before releasing a new deployment, verify:
 - Logs are reachable in CloudWatch
 - Core user flows still work in the app
 
-## 11. Next Steps
+## 12. Next Steps
 
 After the initial deployment is stable, consider:
 

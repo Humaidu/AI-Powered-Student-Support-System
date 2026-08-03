@@ -1,6 +1,16 @@
 # Developer Onboarding Guide
 
-This guide helps a new contributor get the AI-Powered Student Support System running locally and understand the main development workflow.
+This guide helps a new contributor get the AI-Powered Student Support System running locally and understand the expected development workflow.
+
+## Quick start
+
+If you want the shortest path to a working local setup, follow these steps:
+
+1. Install the prerequisites below.
+2. Clone the repository and create the Python and Node environments.
+3. Start the frontend locally.
+4. Run the backend tests.
+5. Review the architecture and API documentation before making changes.
 
 ## 1. Prerequisites
 
@@ -27,6 +37,12 @@ The repository is split into three main areas:
 - Frontend: [frontend/student-ai-support](../frontend/student-ai-support)
 - Backend logic and Lambda handlers: [backend](../backend)
 - Infrastructure as Code: [terraform/backend](../terraform/backend)
+
+A good mental model is:
+
+- the frontend handles user interaction and requests
+- the backend processes business logic and AI/document workflows
+- Terraform provisions the AWS resources that make the system run in the cloud
 
 ## 3. Clone and Setup
 
@@ -139,12 +155,23 @@ terraform plan
 ## 7. Recommended Development Practices
 
 - Keep frontend and backend changes separate when possible.
-- Prefer small pull requests with clear descriptions.
+- Prefer small, focused pull requests with clear descriptions.
 - Run tests before opening a PR.
 - If you change API behavior, update the API contract documentation in [backend/docs/API_CONTRACT.md](../backend/docs/API_CONTRACT.md).
 - If you change infrastructure, review the Terraform plan carefully before applying it.
+- Keep environment variables and secrets out of source control.
+- Use meaningful commit messages and include context for reviewers.
 
-## 8. Common Setup Issues
+## 8. Contribution Checklist
+
+Before you open a pull request, make sure you have:
+
+- run the relevant tests
+- updated documentation if behavior changed
+- checked that local setup still works
+- reviewed the diff for accidental files or credentials
+
+## 9. Common Setup Issues
 
 ### Python package errors
 
@@ -168,7 +195,7 @@ or verify your active profile:
 aws sts get-caller-identity
 ```
 
-## 9. Next Steps
+## 10. Next Steps
 
 Once your local environment is working, the next best steps are:
 
@@ -176,3 +203,4 @@ Once your local environment is working, the next best steps are:
 2. Review the backend design in [docs/BACKEND_DEVELOPMENT_GUIDE.md](BACKEND_DEVELOPMENT_GUIDE.md)
 3. Review the API contract in [backend/docs/API_CONTRACT.md](../backend/docs/API_CONTRACT.md)
 4. Start with a small backend or frontend task and test it locally before deployment
+5. If you are preparing infrastructure changes, review the deployment guide in [docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md](DEPLOYMENT_AND_OPERATIONS_GUIDE.md)

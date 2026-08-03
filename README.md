@@ -105,6 +105,22 @@ cd ../../backend
 pytest tests -v
 ```
 
+## API endpoints
+
+The application exposes REST-style endpoints under the shared API base path `/api/v1`.
+
+Common routes include:
+
+- `POST /api/v1/documents` — create document metadata and obtain an upload URL
+- `GET /api/v1/documents` — list documents
+- `GET /api/v1/documents/{documentId}` — retrieve document details
+- `DELETE /api/v1/documents/{documentId}` — delete a document
+- `POST /api/v1/documents/{documentId}/approve` — approve a document for student access
+- `POST /api/v1/chat/sessions` and related chat routes — create and manage chat sessions and messages
+- `POST /api/v1/feedback` — submit feedback for AI responses
+
+For the full request/response contract, see [backend/docs/API_CONTRACT.md](backend/docs/API_CONTRACT.md).
+
 ## Deployment
 
 Infrastructure is managed with Terraform from the backend module:
@@ -134,7 +150,7 @@ Useful references for contributors and operators:
 | William Mukoyani | Mentor |
 | Freda Kemphrey | Member |
 | Hassanatu Ahmed | Member |
-| Humaidu Ali Yakubu | Member |
+| Humaidu Ali Mohammed | Member |
 | Joel Addition | Member |
 | Frank Amoako Boafo | Member |
 
@@ -143,9 +159,9 @@ Useful references for contributors and operators:
 - [x] Project setup and planning
 - [x] Frontend and backend structure
 - [x] Documentation foundation
-- [ ] Full AWS deployment readiness
-- [ ] Production monitoring and observability
-- [ ] Expanded AI and document workflows
+- [x] Full AWS deployment readiness
+- [x] Production monitoring and observability
+- [x] Expanded AI and document workflows
 
 
 ## License
