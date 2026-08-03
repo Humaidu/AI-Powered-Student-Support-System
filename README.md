@@ -50,6 +50,32 @@ Student → API Gateway (REST) → Lambda (per-route handler)
 
 ## Project Structure
 
+```text
+AI-Powered-Student-Support-System/
+├── backend/                  # Lambda handlers, shared utilities, and backend tests
+│   ├── src/                  # Feature-based backend modules
+│   ├── tests/                # Python tests for backend handlers
+│   └── docs/                 # API contract and backend docs
+├── frontend/                 # Frontend application
+│   └── student-ai-support/   # Vite + React + TypeScript app
+├── terraform/                # Infrastructure as Code for AWS resources
+│   └── backend/              # Terraform configuration for backend services
+├── docs/                     # Project documentation and guides
+└── README.md                 # Project overview and entry point
+```
+
+---
+
+## Documentation
+
+Useful references for contributors and operators:
+
+- [Developer Onboarding Guide](docs/DEVELOPER_ONBOARDING_GUIDE.md)
+- [Deployment and Operations Guide](docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md)
+- [Architecture Overview](ARCHITECTURE.md)
+- [Backend Development Guide](docs/BACKEND_DEVELOPMENT_GUIDE.md)
+- [API Contract](backend/docs/API_CONTRACT.md)
+
 ---
 
 ## Getting Started
@@ -109,9 +135,14 @@ Credentials are handled via GitHub OIDC federation to an AWS IAM role — no lon
 
 | Name | Role |
 |------|------|
-|      | DevOps / Backend / IaC |
-|      | Backend |
-|      | QA |
+| Richard Vidzrakou | Team Leader |
+| William Mukoyani | Mentor |
+| Freda Kemphrey | Member |
+| Hassanatu Ahmed | Member |
+| Humaidu Ali Mohammed | Member |
+| Joel Addition | Member |
+| Frank Amoako Boafo| Member |
+
 
 ---
 ## License
