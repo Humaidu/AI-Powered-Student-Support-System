@@ -1,70 +1,120 @@
 # AI-Powered Student Support System
 
-A serverless AWS application that lets students submit academic questions and receive AI-generated responses in real time, with all interactions durably stored for FAQ tracking and analytics.
+A serverless, AI-powered student support platform built for academic institutions. It helps students ask questions in natural language, retrieves grounded answers from approved institutional documents, and supports document review and feedback workflows for administrators.
 
----
-## Problem
+## Why this project matters
 
-Educational institutions are overwhelmed by high volumes of repetitive academic queries, leading to slow response times and strained manual support teams. This system automates first-line responses using AI, while giving staff a searchable record of what students are asking.
+Educational teams often spend significant time answering repetitive academic and administrative questions. This system reduces response time by combining conversational AI with retrieval-based knowledge from trusted documents.
 
----
-## Architecture
+## Key features
 
-```
-Student → API Gateway (REST) → Lambda (per-route handler)
+- AI chat assistant for student support
+- Retrieval-augmented generation grounded in institutional documents
+- Document upload, review, approval, and deletion workflows
+- Conversation history and feedback collection
+- Secure authentication and role-based access
+- Serverless deployment on AWS with Terraform
+- Local mock mode for frontend development
+
+## Architecture at a glance
+
+- Frontend: React, TypeScript, and Vite
+- Backend: Python-based AWS Lambda handlers
+- Data storage: DynamoDB
+- File storage: Amazon S3
+- Search layer: OpenSearch Serverless
+- AI generation and embeddings: Amazon Bedrock or compatible providers
+- Infrastructure: Terraform
+
+```text
+Student App → API Gateway → Lambda handlers → DynamoDB / S3 / OpenSearch
                                    │
-                    ┌──────────────┼───────────────┐
-                    ▼                              ▼
-              DynamoDB (questions/answers)   AI Service (OpenAI or Bedrock)
-                                                     │
-                                              response written back
-                                                     ▼
-                                              DynamoDB (store Q&A pair)
-
+                                   ▼
+                              AI reasoning layer
 ```
 
-
-**Core AWS services:** API Gateway, Lambda, DynamoDB, CloudWatch, IAM (OIDC federation from GitHub Actions), Bedrock (or OpenAI API for AI responses).
-
----
-## API Endpoints
-
-| Method | Path              | Description                        |
-|--------|-------------------|-------------------------------------|
-| POST   | `/ask`            | Submit a question, get an AI answer |
-| GET    | `/question`       | View previous questions             |
-| GET    | `/faq`             | View commonly asked questions       |
-| DELETE | `/question/{id}`   | Delete a question record            |
-
----
-## Tech Stack
-
-- **Backend:** Python (AWS Lambda)
-- **Infra as Code:** Terraform
-- **CI/CD:** GitHub Actions (OIDC-based AWS auth, no static credentials)
-- **Data store:** Amazon DynamoDB (single-table design)
-- **AI layer:** Amazon Bedrock Agent (RAG) or OpenAI API
-- **Observability:** Amazon CloudWatch (logs, alarms)
-
----
-
-## Project Structure
+## Project structure
 
 ```text
 AI-Powered-Student-Support-System/
-├── backend/                  # Lambda handlers, shared utilities, and backend tests
-│   ├── src/                  # Feature-based backend modules
-│   ├── tests/                # Python tests for backend handlers
-│   └── docs/                 # API contract and backend docs
-├── frontend/                 # Frontend application
-│   └── student-ai-support/   # Vite + React + TypeScript app
-├── terraform/                # Infrastructure as Code for AWS resources
-│   └── backend/              # Terraform configuration for backend services
-├── docs/                     # Project documentation and guides
-└── README.md                 # Project overview and entry point
+├── backend/                    # Lambda handlers, shared utilities, and backend tests
+│   ├── src/                    # Feature-based backend modules
+│   ├── tests/                  # Python tests
+│   └── docs/                   # Backend API documentation
+├── frontend/                   # Frontend application
+│   └── student-ai-support/     # Vite + React + TypeScript app
+├── terraform/                  # Infrastructure as Code for AWS resources
+│   └── backend/                # Terraform configuration
+├── docs/                       # Project documentation and guides
+└── README.md                   # Project overview and entry point
 ```
 
----
+## Getting started
+
+### Prerequisites
+
+- Python 3.11 or 3.12
+- Node.js 20+
+- npm
+- Terraform 1.5+
+- AWS CLI configured with access to your target account
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Humaidu/AI-Powered-Student-Support-System.git
+cd AI-Powered-Student-Support-System
+```
+
+### 2. Set up the backend
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+pip install -r requirements-lambda.txt
+```
+
+### 3. Set up the frontend
+
+```bash
+cd ../frontend/student-ai-support
+npm install
+```
+
+### 4. Run locally
+
+Start the frontend application:
+
+```bash
+npm run dev
+```
+
+The frontend supports mock mode by default. To use the real AWS-backed flow, set:
+
+```bash
+export VITE_APP_MODE=aws
+export VITE_API_BASE_URL=http://localhost:3000/api/v1
+```
+
+Run backend tests:
+
+```bash
+cd ../../backend
+pytest tests -v
+```
+
+## Deployment
+
+Infrastructure is managed with Terraform from the backend module:
+
+```bash
+cd terraform/backend
+terraform init
+terraform plan
+terraform apply
+```
 
 ## Documentation
 
@@ -76,61 +126,6 @@ Useful references for contributors and operators:
 - [Backend Development Guide](docs/BACKEND_DEVELOPMENT_GUIDE.md)
 - [API Contract](backend/docs/API_CONTRACT.md)
 
----
-
-## Getting Started
-
-### Prerequisites
-- AWS account with IAM permissions to create Lambda, API Gateway, DynamoDB, IAM roles
-- Terraform >= 1.5
-- Python 3.12
-- GitHub repo with OIDC trust configured to your AWS account
-
-### Local Setup
-```bash
-git clone https://github.com/Humaidu/AI-Powered-Student-Support-System.git
-cd AI-Powered-Student-Support-System
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-```
-
-### Deploy Infrastructure
-```bash
-cd infra
-terraform init
-terraform plan
-terraform apply
-```
-
-### Run Tests
-```bash
-pytest tests/ -v
-```
----
-## CI/CD Pipeline
-
-- **On pull request:** lint → unit tests
-- **On merge to `main`:** package Lambda functions → `terraform apply` → smoke test live endpoint
-
-Credentials are handled via GitHub OIDC federation to an AWS IAM role — no long-lived access keys are stored in secrets.
-
----
-## Monitoring
-
-- CloudWatch Log Groups per Lambda function
-- Alarms on Lambda error rate and API Gateway p99 latency
-- IAM roles scoped to least privilege per function
-
----
-## Roadmap / Status
-
-- [ ] Phase 1: Project setup & planning
-- [ ] Phase 2: API development (4 endpoints)
-- [ ] Phase 3: AI integration
-- [ ] Phase 4: CI/CD pipeline
-- [ ] Phase 5: Logging, monitoring & optimization
-
----
 ## Team
 
 | Name | Role |
@@ -139,12 +134,20 @@ Credentials are handled via GitHub OIDC federation to an AWS IAM role — no lon
 | William Mukoyani | Mentor |
 | Freda Kemphrey | Member |
 | Hassanatu Ahmed | Member |
-| Humaidu Ali Mohammed | Member |
+| Humaidu Ali Yakubu | Member |
 | Joel Addition | Member |
-| Frank Amoako Boafo| Member |
+| Frank Amoako Boafo | Member |
+
+## Roadmap
+
+- [x] Project setup and planning
+- [x] Frontend and backend structure
+- [x] Documentation foundation
+- [ ] Full AWS deployment readiness
+- [ ] Production monitoring and observability
+- [ ] Expanded AI and document workflows
 
 
----
 ## License
 
 Internal Azubi Africa project — for educational use.
