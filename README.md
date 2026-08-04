@@ -29,9 +29,12 @@ The mock mode is intended for UI and workflow testing without depending on live 
 - Infrastructure: Terraform
 
 
-### Architecture diagram
+### System Architecture
+
 
 ![Architecture diagram](docs/ARCHITECTURE_DIAGRAM.png)
+
+
 
 A visual overview of the system design is available here:
 
