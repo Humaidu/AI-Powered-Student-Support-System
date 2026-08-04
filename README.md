@@ -33,6 +33,13 @@ Student App → API Gateway → Lambda handlers → DynamoDB / S3 / OpenSearch
                               AI reasoning layer
 ```
 
+### Architecture diagram
+
+A visual overview of the system design is available here:
+
+- [Architecture diagram](docs/ARCHITECTURE_DIAGRAM.png)
+- [Architecture overview](docs/ARCHITECTURE.md)
+
 ## Project structure
 
 ```text
@@ -138,7 +145,8 @@ Useful references for contributors and operators:
 
 - [Developer Onboarding Guide](docs/DEVELOPER_ONBOARDING_GUIDE.md)
 - [Deployment and Operations Guide](docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md)
-- [Architecture Overview](ARCHITECTURE.md)
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.png)
 - [Backend Development Guide](docs/BACKEND_DEVELOPMENT_GUIDE.md)
 - [API Contract](backend/docs/API_CONTRACT.md)
 
