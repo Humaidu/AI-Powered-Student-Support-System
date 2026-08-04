@@ -33,6 +33,8 @@ The mock mode is intended for UI and workflow testing without depending on live 
 
 
 ![Architecture diagram](docs/ARCHITECTURE_DIAGRAM.png)
+Interactive Source: [draw.io diagram](https://drive.google.com/file/d/1IOWVk5wiRwW7vo87qKzbIsLCoi3O_mrz/view?usp=sharing)
+
 
 
 
