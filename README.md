@@ -4,7 +4,7 @@ A serverless, AI-powered student support platform built for academic institution
 
 ## Why this project matters
 
-Educational teams often spend significant time answering repetitive academic and administrative questions. This system reduces response time by combining conversational AI with retrieval-based knowledge from trusted documents.
+Educational teams often spend significant time answering repetitive academic and administrative questions. This system is designed to reduce first-response time for common FAQs by routing them to a document-grounded assistant instead of relying only on staff availability.
 
 ## Key features
 
@@ -16,6 +16,8 @@ Educational teams often spend significant time answering repetitive academic and
 - Serverless deployment on AWS with Terraform
 - Local mock mode for frontend development
 
+The mock mode is intended for UI and workflow testing without depending on live AWS services. It simulates API responses, authentication flows, and AI answers so frontend work can proceed even when the backend is not yet running.
+
 ## Architecture at a glance
 
 - Frontend: React, TypeScript, and Vite
@@ -26,18 +28,13 @@ Educational teams often spend significant time answering repetitive academic and
 - AI generation and embeddings: Amazon Bedrock or compatible providers
 - Infrastructure: Terraform
 
-```text
-Student App → API Gateway → Lambda handlers → DynamoDB / S3 / OpenSearch
-                                   │
-                                   ▼
-                              AI reasoning layer
-```
 
 ### Architecture diagram
 
+![Architecture diagram](docs/ARCHITECTURE_DIAGRAM.png)
+
 A visual overview of the system design is available here:
 
-- [Architecture diagram](docs/ARCHITECTURE_DIAGRAM.png)
 - [Architecture overview](docs/ARCHITECTURE.md)
 
 ## Project structure
@@ -98,7 +95,7 @@ Start the frontend application:
 npm run dev
 ```
 
-The frontend supports mock mode by default. To use the real AWS-backed flow, set:
+The frontend supports mock mode by default. In mock mode, the app uses simulated responses for chat, auth, and document actions. To use the real AWS-backed flow, set:
 
 ```bash
 export VITE_APP_MODE=aws
@@ -114,7 +111,7 @@ pytest tests -v
 
 ## API endpoints
 
-The application exposes REST-style endpoints under the shared API base path `/api/v1`.
+The application exposes REST-style endpoints under the shared API base path `/api/v1`. All routes are expected to be called with an authenticated user context, typically through a bearer token issued by the configured identity provider; see [backend/docs/API_CONTRACT.md](backend/docs/API_CONTRACT.md) for the full contract.
 
 Common routes include:
 
@@ -139,6 +136,18 @@ terraform plan
 terraform apply
 ```
 
+## Troubleshooting and FAQ
+
+Common issues you may hit when working with this stack include:
+
+- OpenSearch Serverless access or indexing problems after deployment
+- Bedrock or model access issues when generating embeddings or answers
+- Lambda permission errors caused by incomplete IAM configuration
+- Frontend requests failing because the app is still in mock mode or the API base URL is incorrect
+- Cold starts or slow responses during early-stage development and deployment testing
+
+For deeper guidance, see the deployment and operations documentation in [docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md](docs/DEPLOYMENT_AND_OPERATIONS_GUIDE.md).
+
 ## Documentation
 
 Useful references for contributors and operators:
@@ -162,15 +171,14 @@ Useful references for contributors and operators:
 | Joel Addition | Member |
 | Frank Amoako Boafo | Member |
 
-## Roadmap
+## Future improvements
 
-- [x] Project setup and planning
-- [x] Frontend and backend structure
-- [x] Documentation foundation
-- [x] Full AWS deployment readiness
-- [x] Production monitoring and observability
-- [x] Expanded AI and document workflows
+Planned next steps for the project include:
 
+- adding stronger production monitoring and alerting
+- improving document ingestion and search quality
+- expanding admin workflows and governance controls
+- refining the AI response experience with better grounding and feedback loops
 
 ## License
 
