@@ -84,30 +84,9 @@ The platform uses Retrieval-Augmented Generation (RAG) so responses are grounded
 
 The platform follows a serverless event-driven architecture where client applications communicate through API Gateway and Lambda functions manage business logic.
 
-```text
-Client Applications
-    │
-    ▼
-Amazon API Gateway
-    │
-    ├───────────────┬───────────────┬───────────────┬───────────────┐
-    │               │               │               │               │
-    ▼               ▼               ▼               ▼
-Auth Lambda    Chat Lambda    Document Lambda   Admin Lambda
+![Architecture diagram](docs/ARCHITECTURE_DIAGRAM.png)
 
-    │
-    ▼
-DynamoDB
-
-    ───────────────┬──────────────
-    │              │
-    ▼              ▼
-S3         OpenSearch Vector DB
-
-    │
-    ▼
-Amazon Bedrock
-```
+Interactive Source: [draw.io diagram](https://drive.google.com/file/d/1IOWVk5wiRwW7vo87qKzbIsLCoi3O_mrz/view?usp=sharing)
 
 ## 5. Backend Service Architecture
 
