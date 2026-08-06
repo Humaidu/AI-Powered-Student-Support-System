@@ -10,7 +10,7 @@ os.environ.setdefault("TABLE_NAME", "test-table")
 os.environ.setdefault("BEDROCK_MODEL_ID", "test-model")
 os.environ.setdefault("BEDROCK_EMBEDDING_MODEL_ID", "test-embed-model")
 os.environ.setdefault("OPENSEARCH_ENDPOINT", "https://test-endpoint")
-os.environ.setdefault("AWS_DEFAULT_REGION", "eu-west-1")
+os.environ.setdefault("AWS_DEFAULT_REGION", "us-east-1")
 
 handler = load_handler("chat", "send_message")
 

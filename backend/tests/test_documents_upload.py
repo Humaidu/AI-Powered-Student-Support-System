@@ -8,7 +8,7 @@ from _load import load_handler
 
 os.environ.setdefault("TABLE_NAME", "test-table")
 os.environ.setdefault("DOCUMENT_BUCKET", "test-bucket")
-os.environ.setdefault("AWS_DEFAULT_REGION", "eu-west-1")
+os.environ.setdefault("AWS_DEFAULT_REGION", "us-east-1")
 
 handler = load_handler("documents", "upload")
 

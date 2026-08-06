@@ -1,0 +1,63 @@
+
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "terraform/backend/**"
+      - ".github/workflows/backend_deploy.yml"
+
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Uses the same script a developer would run locally before
+      # `terraform apply` — see backend/scripts/package_lambdas.sh.
+      - name: Package Lambda functions
+        run: bash backend/scripts/package_lambdas.sh
+
+      # Static access keys for the deploy IAM user (terraform/backend/iam.tf
+      # -> aws_iam_user.github_actions_deploy). 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        working-directory: terraform/backend
+        run: terraform init
+
+      - name: Terraform plan
+        working-directory: terraform/backend
+        run: terraform plan -var="ai_provider=gemini"
+
+      # - name: Terraform apply
+      #   working-directory: terraform/backend
+      #   run: terraform apply -auto-approve -var="ai_provider=gemini"
+
+      - name: Smoke test live endpoint
+        working-directory: terraform/backend
+        run: |
+          API_URL=$(terraform output -raw api_endpoint)
+          # /api/v1/documents requires auth, so a 401 (not a connection
+          # failure or 5xx) is actually the expected "the API is up" signal.
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$API_URL/api/v1/documents")
+          if [ "$STATUS" != "401" ]; then
+            echo "Expected 401 (unauthenticated) from a healthy API, got $STATUS"
+            exit 1
+          fi
+
